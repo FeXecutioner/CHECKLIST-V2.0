@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>FeXecutioner | Trading OS v3.5</title>
+<title>FeXecutioner | Visual OS v4.0</title>
 
 <!-- External Resources -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,12 +40,12 @@
 
   .wrap { max-width: 1000px; margin: 0 auto; position: relative; }
 
-  /* Tabs */
+  /* Navigation */
   .mode-nav { display: flex; gap: 2px; background: var(--line); padding: 2px; border-radius: 4px; margin-bottom: 20px; }
   .nav-btn { flex: 1; background: var(--bg); border: none; padding: 14px; font-family: var(--mono); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
   .nav-btn.active { background: var(--ink); color: var(--panel); }
 
-  /* Telemetry */
+  /* Telemetry Header */
   .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 20px; }
   .brand h1 { font-family: var(--disp); font-size: 32px; margin: 0; text-transform: uppercase; line-height: 1; }
   .telemetry { text-align: right; font-family: var(--mono); }
@@ -59,12 +59,12 @@
   .range-out { color: var(--line); }
   .range-in { color: var(--ink); border-bottom: 2px solid var(--ink); }
 
-  /* Master Console */
+  /* Master Status */
   .master { position: relative; border: 1px solid var(--ink); background: var(--panel); padding: 24px; border-radius: 4px; margin-bottom: 20px; box-shadow: 6px 6px 0 var(--line); }
   .m-status { font-family: var(--disp); font-size: 56px; font-weight: 700; line-height: 1; }
   #mmsg { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 5px; }
 
-  /* Grids */
+  /* Grid Layout */
   .page { display: none; }
   .page.active { display: block; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -73,10 +73,10 @@
   .seq { background: var(--ink); color: var(--panel); font-family: var(--mono); font-size: 10px; padding: 2px 6px; border-radius: 2px; }
   .p-name { font-family: var(--disp); font-weight: 700; font-size: 14px; text-transform: uppercase; }
 
-  /* Checklist Items */
+  /* Inputs & Checkboxes */
   .check { display: flex; gap: 12px; padding: 14px 12px; cursor: pointer; align-items: flex-start; transition: 0.1s; }
   .check:hover { background: var(--panel-2); }
-  .check input { width: 20px; height: 20px; accent-color: var(--ink); margin-top: 2px; cursor: pointer; }
+  .check input { width: 20px; height: 20px; accent-color: var(--ink); margin-top: 2px; }
   .c-text { font-size: 14px; line-height: 1.4; font-weight: 500; }
   .note { display: block; font-size: 11px; color: var(--ink-faint); font-family: var(--mono); margin-top: 5px; }
   
@@ -85,51 +85,56 @@
   body[data-setup="continuation"] .note-continuation { display: block; }
   body[data-setup="reversal"] .note-reversal { display: block; }
 
-  /* Toggles */
   .setup-toggle { display: flex; gap: 5px; padding: 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); }
-  .s-btn { flex: 1; padding: 8px; font-family: var(--mono); font-size: 10px; font-weight: 700; border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; background: var(--panel); transition: 0.2s; }
+  .s-btn { flex: 1; padding: 8px; font-family: var(--mono); font-size: 10px; font-weight: 700; border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; background: var(--panel); }
   .s-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
 
-  /* Risk Display */
   .buffer-row { background: var(--panel-2); padding: 15px; font-family: var(--mono); font-size: 11px; line-height: 1.6; border-bottom: 1px solid var(--line); }
   .buffer-row b { color: var(--red); font-weight: 700; }
 
-  /* Gate Scan */
+  /* Gate & Scan */
   .gate { position: relative; border: 2px solid var(--line); transition: 0.5s; }
   .gate.armed { border-color: var(--green); box-shadow: 0 0 20px rgba(39, 211, 140, 0.2); }
   .scan-line { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(39, 211, 140, 0.15), transparent); pointer-events: none; }
   .gate.armed .scan-line { animation: scan 2s linear infinite; }
   @keyframes scan { from { left: -100%; } to { left: 100%; } }
 
-  /* Dynamic Flow */
+  /* GO FLOW */
   #bottom-flow { display: none; margin-top: 40px; border-top: 4px solid var(--ink); padding-top: 40px; }
   #exec-alert { background: var(--ink); color: var(--panel); padding: 18px; text-align: center; font-family: var(--mono); font-weight: 700; margin-bottom: 25px; animation: blink 1.2s infinite; letter-spacing: 4px; font-size: 14px; border-radius: 4px; }
   @keyframes blink { 50% { opacity: 0.4; } }
-  #journal-area { padding: 25px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
-
-  /* History Rendering */
-  .history-card { background: var(--panel); border: 1px solid var(--line); padding: 20px; margin-bottom: 15px; border-radius: 4px; box-shadow: 4px 4px 0 var(--line); }
-  .h-date { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-bottom: 10px; border-bottom: 1px solid var(--panel-2); padding-bottom: 5px; }
-  .h-meta { display: flex; gap: 15px; margin-bottom: 10px; }
-  .h-tag { font-family: var(--mono); font-size: 10px; padding: 3px 8px; background: var(--panel-2); border-radius: 2px; text-transform: uppercase; }
-
-  .screenshot-zone { border: 2px dashed var(--line); background: var(--panel-2); min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; margin: 15px; border-radius: 4px; overflow: hidden; }
-  .screenshot-zone img { max-width: 100%; height: auto; display: block; }
+  #journal-area { padding: 25px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; position: relative; }
 
   .field-group { padding: 12px; border-bottom: 1px solid var(--panel-2); }
   label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
   textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid var(--line); background: var(--panel-2); padding: 12px; font-family: var(--body); font-size: 13px; border-radius: 2px; color: var(--ink); }
 
-  /* Action Buttons */
+  .screenshot-zone { border: 2px dashed var(--line); background: var(--panel-2); min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; margin: 15px; border-radius: 4px; overflow: hidden; }
+  .screenshot-zone img { max-width: 100%; height: auto; display: block; }
+
+  /* History Styling */
+  .history-item { margin-bottom: 30px; border: 1px solid var(--line); background: var(--panel); border-radius: 4px; overflow: hidden; box-shadow: 6px 6px 0 var(--line); }
+  .history-meta { padding: 10px 15px; background: var(--ink); color: white; font-family: var(--mono); font-size: 11px; display: flex; justify-content: space-between; }
+  .history-img { width: 100%; height: auto; display: block; background: #eee; }
+  .delete-btn { background: var(--red); color: white; border: none; padding: 5px 10px; font-size: 10px; cursor: pointer; border-radius: 2px; }
+
+  /* Buttons */
   .footer-actions { display: flex; gap: 10px; margin-top: 40px; }
   .btn { flex: 1; padding: 20px; font-family: var(--mono); font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; border: 1px solid var(--ink); font-size: 11px; transition: 0.2s; }
-  .btn-save { background: var(--ink); color: var(--panel); border: none; }
   .btn-commit { background: var(--green); color: var(--ink); border-color: var(--ink); }
+  .btn-save { background: var(--ink); color: var(--panel); border: none; }
   .btn-reset { background: transparent; color: var(--ink-faint); border-color: var(--line); }
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .btn:hover { transform: translateY(-2px); }
+  
+  #status-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--mono); }
 </style>
 </head>
 <body data-setup="continuation">
+
+<div id="status-overlay" style="display:none;">
+  <div style="font-size: 20px; margin-bottom: 10px;">COMMITTING TO DATABASE...</div>
+  <div id="progress-text">Capturing visual state...</div>
+</div>
 
 <div class="wrap">
   <nav class="mode-nav">
@@ -196,7 +201,7 @@
         <div class="p-head"><span class="seq">S4</span><span class="p-name">Risk & Buffer</span></div>
         <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
           <div class="field-group"><label>Account Size $</label><input type="number" id="acctSize" placeholder="50000"></div>
-          <div class="field-group"><label>Max Drawdown $</label><input type="number" id="maxDD" placeholder="2000" oninput="calcBuffer()"></div>
+          <div class="field-group"><label>Total Drawdown $</label><input type="number" id="maxDD" placeholder="2000" oninput="calcBuffer()"></div>
         </div>
         <div class="field-group"><label>Risk Per Trade $</label><input type="number" id="riskPerTrade" placeholder="400" oninput="calcBuffer()"></div>
         <div class="buffer-row" id="bufferDisplay">Enter data to calculate buffer.</div>
@@ -232,13 +237,11 @@
             </div>
             <div class="field-group"><label>Entry Details (Model/Time)</label><input type="text" id="j-entry"></div>
           </div>
-
           <div class="panel">
             <div class="p-head"><span class="seq">PSY</span><span class="p-name">Psychology Review</span></div>
             <div class="field-group"><label>Morning Routine / Wake Up</label><input type="text" id="j-wake"></div>
             <div class="field-group"><label>Feelings (Pre / During / After)</label><textarea id="j-feelings" rows="5"></textarea></div>
           </div>
-
           <div class="panel">
             <div class="p-head"><span class="seq">IMG</span><span class="p-name">Chart Snapshot</span></div>
             <div class="screenshot-zone" onclick="document.getElementById('file-input').click()">
@@ -247,7 +250,6 @@
               <input type="file" id="file-input" style="display:none;" onchange="handlePreview(this)">
             </div>
           </div>
-
           <div class="panel" style="grid-column: 1 / -1;">
             <div class="p-head"><span class="seq">REF</span><span class="p-name">Reflection</span></div>
             <div class="items" style="display:flex; gap:20px; border-bottom:1px solid var(--panel-2);">
@@ -262,8 +264,8 @@
         </div>
       </div>
       <footer class="footer-actions">
-        <button class="btn btn-commit" onclick="commitToHistory()">Commit to Internal History</button>
-        <button class="btn btn-save" onclick="saveAsPhoto()">Save Journal Photo</button>
+        <button class="btn btn-commit" onclick="commitVisualTrade()">Commit to Internal History</button>
+        <button class="btn btn-save" onclick="saveAsPhoto()">Download Journal Photo</button>
         <button class="btn btn-reset" onclick="resetSession()">Reset Console</button>
       </footer>
     </div>
@@ -271,19 +273,28 @@
 
   <!-- PAGE 2: HISTORY -->
   <main id="page-journal" class="page">
-    <div id="history-container">
-      <!-- Trades render here -->
+    <div id="history-gallery">
+      <!-- Visual trades render here -->
     </div>
   </main>
 </div>
 
 <script>
+  // --- DATABASE ENGINE (IndexedDB) ---
+  let db;
+  const request = indexedDB.open("FeXecutionerDB", 1);
+  request.onupgradeneeded = e => {
+    db = e.target.result;
+    db.createObjectStore("trades", { keyPath: "id" });
+  };
+  request.onsuccess = e => db = e.target.result;
+
   function switchPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('page-' + id).classList.add('active');
     document.getElementById('btn-' + id).classList.add('active');
-    if(id === 'journal') renderHistory();
+    if(id === 'journal') renderVisualHistory();
   }
 
   function setSetup(type) {
@@ -303,19 +314,15 @@
   function updateMaster() {
     const sDone = Array.from(steps).filter(s => s.checked).length;
     const gDone = Array.from(gateSteps).filter(s => s.checked).length;
-    
-    if (sCount = sDone === steps.length) {
+    if (sDone === steps.length) {
       gate.classList.add('armed');
       gateSteps.forEach(gs => gs.disabled = false);
       mstatus.innerText = "STANDBY";
-      mmsg.innerText = "Gate armed. Complete final Go/No-Go.";
     } else {
       gate.classList.remove('armed');
       gateSteps.forEach(gs => { gs.disabled = true; gs.checked = false; });
       mstatus.innerText = "NO-GO";
-      mmsg.innerText = "Complete S1–S4 to arm the gate.";
     }
-
     if (sDone === steps.length && gDone === gateSteps.length) {
       mstatus.innerText = "GO";
       mstatus.style.color = "var(--green)";
@@ -357,8 +364,7 @@
     const diff = now.getTime() - nyDate.getTime();
     const localStart = new Date(nyDate.setHours(9, 30, 0, 0) + diff);
     const localEnd = new Date(nyDate.setHours(11, 0, 0, 0) + diff);
-    const opts = { hour: '2-digit', minute: '2-digit', hour12: true };
-    range.innerText = `LOCAL: ${localStart.toLocaleTimeString([], opts)} - ${localEnd.toLocaleTimeString([], opts)}`;
+    range.innerText = `LOCAL: ${localStart.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true})} - ${localEnd.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true})}`;
   }
   setInterval(tick, 1000); tick();
 
@@ -375,46 +381,71 @@
     }
   }
 
-  // --- INTERNAL HISTORY ENGINE ---
-  function commitToHistory() {
-    const trade = {
-      id: Date.now(),
-      date: new Date().toLocaleString(),
-      bias: document.getElementById('biasInput').value,
-      entry: document.getElementById('j-entry').value,
-      rules: document.getElementById('j-rules').checked,
-      emotions: document.getElementById('j-emotions').checked,
-      logic: document.getElementById('j-htf').value,
-      reflection: document.getElementById('j-better').value
-    };
+  // --- VISUAL COMMIT ENGINE ---
+  async function commitVisualTrade() {
+    const overlay = document.getElementById('status-overlay');
+    overlay.style.display = 'flex';
+    
+    try {
+      const target = document.getElementById('journal-area');
+      const canvas = await html2canvas(target, { backgroundColor: "#D1D4DC", scale: 1, useCORS: true });
+      const imgData = canvas.toDataURL("image/jpeg", 0.7); // Compressed JPEG to save space
 
-    let history = JSON.parse(localStorage.getItem('fex_history') || '[]');
-    history.unshift(trade);
-    localStorage.setItem('fex_history', JSON.stringify(history));
-    alert("Trade Committed to Internal History.");
+      const trade = {
+        id: Date.now(),
+        timestamp: new Date().toLocaleString(),
+        visual: imgData
+      };
+
+      const transaction = db.transaction(["trades"], "readwrite");
+      transaction.objectStore("trades").add(trade);
+      
+      transaction.oncomplete = () => {
+        overlay.style.display = 'none';
+        alert("Visual Entry Saved to Internal Gallery.");
+      };
+    } catch (err) {
+      overlay.style.display = 'none';
+      alert("Error saving: " + err);
+    }
   }
 
-  function renderHistory() {
-    const container = document.getElementById('history-container');
-    const history = JSON.parse(localStorage.getItem('fex_history') || '[]');
+  function renderVisualHistory() {
+    const container = document.getElementById('history-gallery');
+    container.innerHTML = '<div style="font-family:var(--mono); text-align:center; padding:20px;">Fetching records...</div>';
     
-    if (history.length === 0) {
-      container.innerHTML = '<div class="panel" style="padding:40px; text-align:center; color:var(--ink-faint); font-family:var(--mono);">No saved trades found.</div>';
-      return;
-    }
+    const transaction = db.transaction(["trades"], "readonly");
+    const store = transaction.objectStore("trades");
+    const request = store.getAll();
 
-    container.innerHTML = history.map(t => `
-      <div class="history-card">
-        <div class="h-date">${t.date}</div>
-        <div class="h-meta">
-          <span class="h-tag" style="color:${t.rules ? 'var(--green)' : 'var(--red)'}">${t.rules ? 'Rules Followed' : 'Rules Broken'}</span>
-          <span class="h-tag">${t.emotions ? 'Emotional Control: OK' : 'Emotions: Compromised'}</span>
+    request.onsuccess = () => {
+      const history = request.result;
+      if (history.length === 0) {
+        container.innerHTML = '<div class="panel" style="padding:40px; text-align:center; color:var(--ink-faint); font-family:var(--mono);">No visual records found.</div>';
+        return;
+      }
+      
+      // Sort newest first
+      history.sort((a, b) => b.id - a.id);
+
+      container.innerHTML = history.map(t => `
+        <div class="history-item">
+          <div class="history-meta">
+            <span>${t.timestamp}</span>
+            <button class="delete-btn" onclick="deleteTrade(${t.id})">DELETE</button>
+          </div>
+          <img src="${t.visual}" class="history-img" alt="Trade Record">
         </div>
-        <div style="font-size:13px; margin-bottom:10px;"><b>Bias:</b> ${t.bias || 'N/A'}</div>
-        <div style="font-size:13px; margin-bottom:10px;"><b>Model:</b> ${t.entry || 'N/A'}</div>
-        <div style="font-size:12px; color:var(--ink-dim); white-space: pre-wrap;"><b>Analysis:</b> ${t.logic || 'None recorded'}</div>
-      </div>
-    `).join('');
+      `).join('');
+    };
+  }
+
+  function deleteTrade(id) {
+    if(confirm("Delete this permanent record?")) {
+      const transaction = db.transaction(["trades"], "readwrite");
+      transaction.objectStore("trades").delete(id);
+      transaction.oncomplete = () => renderVisualHistory();
+    }
   }
 
   function saveAsPhoto() {
@@ -428,10 +459,8 @@
   }
 
   function resetSession() {
-    if(confirm("Wipe current console?")) window.location.reload();
+    if(confirm("Confirm reset? This will wipe the current console data.")) window.location.reload();
   }
-
-  window.onload = () => { if(window.location.hash === '#journal') switchPage('journal'); };
 </script>
 </body>
 </html>
