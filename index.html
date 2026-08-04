@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>FeXecutioner | Trading OS v3.0</title>
+<title>FeXecutioner | Trading OS v3.5</title>
 
 <!-- External Resources -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,10 +13,10 @@
 
 <style>
   :root {
-    --bg: #D1D4DC; /* Chart Background */
-    --panel: #FFFFFF; /* Upclose Candles */
+    --bg: #D1D4DC;
+    --panel: #FFFFFF;
     --panel-2: #e9ebf0;
-    --line: #787B86; /* Downclose Candles */
+    --line: #787B86;
     --ink: #050505;
     --ink-dim: #34363b;
     --ink-faint: #686b72;
@@ -40,114 +40,98 @@
 
   .wrap { max-width: 1000px; margin: 0 auto; position: relative; }
 
-  /* Mode Navigation */
+  /* Tabs */
   .mode-nav { display: flex; gap: 2px; background: var(--line); padding: 2px; border-radius: 4px; margin-bottom: 20px; }
   .nav-btn { flex: 1; background: var(--bg); border: none; padding: 14px; font-family: var(--mono); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
   .nav-btn.active { background: var(--ink); color: var(--panel); }
 
-  /* Telemetry / Clock Header */
+  /* Telemetry */
   .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 20px; }
   .brand h1 { font-family: var(--disp); font-size: 32px; margin: 0; text-transform: uppercase; line-height: 1; }
   .telemetry { text-align: right; font-family: var(--mono); }
   .clock { font-size: 36px; font-weight: 700; line-height: 1; letter-spacing: 1px; }
   
-  .session-tag { 
-    font-size: 13px; text-transform: uppercase; font-weight: 800; margin-top: 10px; 
-    padding: 8px 16px; border-radius: 2px; display: inline-block; letter-spacing: 1px;
-    transition: 0.3s;
-  }
-  .tag-out { background: var(--line); color: #FFFFFF; } /* Downclose UI */
-  .tag-in { background: #FFFFFF; color: var(--ink); border: 1px solid var(--ink); box-shadow: 0 0 20px rgba(255,255,255,0.8); } /* Upclose UI */
+  .session-tag { font-size: 13px; text-transform: uppercase; font-weight: 800; margin-top: 10px; padding: 8px 16px; border-radius: 2px; display: inline-block; letter-spacing: 1px; transition: 0.3s; }
+  .tag-out { background: var(--line); color: #FFFFFF; }
+  .tag-in { background: #FFFFFF; color: var(--ink); border: 1px solid var(--ink); box-shadow: 0 0 20px rgba(255,255,255,0.8); }
 
   #local-range { font-size: 12px; font-weight: 700; margin-top: 8px; font-family: var(--mono); }
   .range-out { color: var(--line); }
   .range-in { color: var(--ink); border-bottom: 2px solid var(--ink); }
 
-  /* Master Status Bar (Static at Top) */
-  .master {
-    position: relative; border: 1px solid var(--ink); background: var(--panel); 
-    padding: 24px; border-radius: 4px; margin-bottom: 20px; box-shadow: 6px 6px 0 var(--line);
-  }
+  /* Master Console */
+  .master { position: relative; border: 1px solid var(--ink); background: var(--panel); padding: 24px; border-radius: 4px; margin-bottom: 20px; box-shadow: 6px 6px 0 var(--line); }
   .m-status { font-family: var(--disp); font-size: 56px; font-weight: 700; line-height: 1; }
   #mmsg { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 5px; }
 
-  /* Grid Layout */
+  /* Grids */
   .page { display: none; }
   .page.active { display: block; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
   .panel { border: 1px solid var(--line); background: var(--panel); border-radius: 4px; overflow: hidden; margin-bottom: 5px; }
   .p-head { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); }
   .seq { background: var(--ink); color: var(--panel); font-family: var(--mono); font-size: 10px; padding: 2px 6px; border-radius: 2px; }
   .p-name { font-family: var(--disp); font-weight: 700; font-size: 14px; text-transform: uppercase; }
 
-  /* Setup Selection Toggle */
-  .setup-toggle { display: flex; gap: 5px; padding: 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); }
-  .s-btn { flex: 1; padding: 8px; font-family: var(--mono); font-size: 10px; font-weight: 700; border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; background: var(--panel); transition: 0.2s; }
-  .s-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
-
-  /* Detailed Checkboxes */
+  /* Checklist Items */
   .check { display: flex; gap: 12px; padding: 14px 12px; cursor: pointer; align-items: flex-start; transition: 0.1s; }
   .check:hover { background: var(--panel-2); }
   .check input { width: 20px; height: 20px; accent-color: var(--ink); margin-top: 2px; cursor: pointer; }
   .c-text { font-size: 14px; line-height: 1.4; font-weight: 500; }
-  .c-text b { font-weight: 700; color: var(--ink); }
   .note { display: block; font-size: 11px; color: var(--ink-faint); font-family: var(--mono); margin-top: 5px; }
-
-  /* Setup Logic sub-text colors */
+  
   .note-continuation { color: var(--green); display: none; }
   .note-reversal { color: var(--amber); display: none; }
   body[data-setup="continuation"] .note-continuation { display: block; }
   body[data-setup="reversal"] .note-reversal { display: block; }
 
-  /* Risk & Calculation Fields */
-  .field-group { padding: 12px; border-bottom: 1px solid var(--panel-2); }
-  label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
-  textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid var(--line); background: var(--panel-2); padding: 12px; font-family: var(--body); font-size: 13px; border-radius: 2px; color: var(--ink); }
+  /* Toggles */
+  .setup-toggle { display: flex; gap: 5px; padding: 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); }
+  .s-btn { flex: 1; padding: 8px; font-family: var(--mono); font-size: 10px; font-weight: 700; border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; background: var(--panel); transition: 0.2s; }
+  .s-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+
+  /* Risk Display */
   .buffer-row { background: var(--panel-2); padding: 15px; font-family: var(--mono); font-size: 11px; line-height: 1.6; border-bottom: 1px solid var(--line); }
   .buffer-row b { color: var(--red); font-weight: 700; }
 
-  /* The Gate & Animation */
+  /* Gate Scan */
   .gate { position: relative; border: 2px solid var(--line); transition: 0.5s; }
   .gate.armed { border-color: var(--green); box-shadow: 0 0 20px rgba(39, 211, 140, 0.2); }
   .scan-line { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(39, 211, 140, 0.15), transparent); pointer-events: none; }
   .gate.armed .scan-line { animation: scan 2s linear infinite; }
   @keyframes scan { from { left: -100%; } to { left: 100%; } }
 
-  /* BOTTOM FLOW (DYNAMIC) */
+  /* Dynamic Flow */
   #bottom-flow { display: none; margin-top: 40px; border-top: 4px solid var(--ink); padding-top: 40px; }
-  
-  #exec-alert {
-    background: var(--ink); color: var(--panel); padding: 18px; 
-    text-align: center; font-family: var(--mono); font-weight: 700; margin-bottom: 25px;
-    animation: blink 1.2s infinite; letter-spacing: 4px; font-size: 14px;
-    border-radius: 4px;
-  }
+  #exec-alert { background: var(--ink); color: var(--panel); padding: 18px; text-align: center; font-family: var(--mono); font-weight: 700; margin-bottom: 25px; animation: blink 1.2s infinite; letter-spacing: 4px; font-size: 14px; border-radius: 4px; }
   @keyframes blink { 50% { opacity: 0.4; } }
-
   #journal-area { padding: 25px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
 
-  .screenshot-zone {
-    border: 2px dashed var(--line); background: var(--panel-2); min-height: 280px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; position: relative; margin: 15px; border-radius: 4px; overflow: hidden;
-  }
+  /* History Rendering */
+  .history-card { background: var(--panel); border: 1px solid var(--line); padding: 20px; margin-bottom: 15px; border-radius: 4px; box-shadow: 4px 4px 0 var(--line); }
+  .h-date { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-bottom: 10px; border-bottom: 1px solid var(--panel-2); padding-bottom: 5px; }
+  .h-meta { display: flex; gap: 15px; margin-bottom: 10px; }
+  .h-tag { font-family: var(--mono); font-size: 10px; padding: 3px 8px; background: var(--panel-2); border-radius: 2px; text-transform: uppercase; }
+
+  .screenshot-zone { border: 2px dashed var(--line); background: var(--panel-2); min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; margin: 15px; border-radius: 4px; overflow: hidden; }
   .screenshot-zone img { max-width: 100%; height: auto; display: block; }
-  .screenshot-zone span { font-family: var(--mono); font-size: 11px; color: var(--line); text-transform: uppercase; margin-top: 10px; }
+
+  .field-group { padding: 12px; border-bottom: 1px solid var(--panel-2); }
+  label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
+  textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid var(--line); background: var(--panel-2); padding: 12px; font-family: var(--body); font-size: 13px; border-radius: 2px; color: var(--ink); }
 
   /* Action Buttons */
   .footer-actions { display: flex; gap: 10px; margin-top: 40px; }
-  .btn { flex: 1; padding: 20px; font-family: var(--mono); font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; border: 1px solid var(--ink); font-size: 12px; }
+  .btn { flex: 1; padding: 20px; font-family: var(--mono); font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; border: 1px solid var(--ink); font-size: 11px; transition: 0.2s; }
   .btn-save { background: var(--ink); color: var(--panel); border: none; }
+  .btn-commit { background: var(--green); color: var(--ink); border-color: var(--ink); }
   .btn-reset { background: transparent; color: var(--ink-faint); border-color: var(--line); }
-
-  @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .head { flex-direction: column; align-items: flex-start; } .telemetry { text-align: left; margin-top: 20px; } }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 </style>
 </head>
 <body data-setup="continuation">
 
 <div class="wrap">
-  <!-- PRIMARY MODE NAVIGATION -->
   <nav class="mode-nav">
     <button class="nav-btn active" id="btn-exec" onclick="switchPage('exec')">Execution Mode</button>
     <button class="nav-btn" id="btn-journal" onclick="switchPage('journal')">Journal History</button>
@@ -165,17 +149,14 @@
     </div>
   </header>
 
-  <!-- MASTER STATUS BAR -->
   <section class="master" id="master">
     <div class="m-status" id="mstatus">NO-GO</div>
     <div id="mmsg">Complete sections S1 through S4 to arm the execution gate.</div>
   </section>
 
-  <!-- MAIN VIEW -->
+  <!-- PAGE 1: EXECUTION -->
   <main id="page-exec" class="page active">
     <div class="grid">
-      
-      <!-- S1: Prep & Selection -->
       <div class="panel">
         <div class="p-head"><span class="seq">S1</span><span class="p-name">Bias & HTF Gap</span></div>
         <div class="setup-toggle">
@@ -183,8 +164,8 @@
           <button class="s-btn" id="btn-rev" onclick="setSetup('reversal')">Reversal</button>
         </div>
         <div class="field-group">
-          <label>Today's Directional Bias</label>
-          <input type="text" id="biasInput" placeholder="HTF Bias and technical reasoning...">
+          <label>Directional Bias</label>
+          <input type="text" id="biasInput" placeholder="HTF Bias and reasoning...">
         </div>
         <div class="items">
           <label class="check"><input type="checkbox" class="step"> <span class="c-text">Checked <b>Premarket price action</b><span class="note">Reviewed overnight highs/lows and premarket VWAP levels.</span></span></label>
@@ -192,7 +173,6 @@
         </div>
       </div>
 
-      <!-- S2: Scaling -->
       <div class="panel">
         <div class="p-head"><span class="seq">S2</span><span class="p-name">Scale to 5m / 15m</span></div>
         <div class="items">
@@ -204,7 +184,6 @@
         </div>
       </div>
 
-      <!-- S3: Inversion -->
       <div class="panel">
         <div class="p-head"><span class="seq">S3</span><span class="p-name">Inversion (1m–5m)</span></div>
         <div class="items">
@@ -213,15 +192,14 @@
         </div>
       </div>
 
-      <!-- S4: Risk -->
       <div class="panel">
         <div class="p-head"><span class="seq">S4</span><span class="p-name">Risk & Buffer</span></div>
         <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
           <div class="field-group"><label>Account Size $</label><input type="number" id="acctSize" placeholder="50000"></div>
-          <div class="field-group"><label>Total Drawdown $</label><input type="number" id="maxDD" placeholder="2000" oninput="calcBuffer()"></div>
+          <div class="field-group"><label>Max Drawdown $</label><input type="number" id="maxDD" placeholder="2000" oninput="calcBuffer()"></div>
         </div>
         <div class="field-group"><label>Risk Per Trade $</label><input type="number" id="riskPerTrade" placeholder="400" oninput="calcBuffer()"></div>
-        <div class="buffer-row" id="bufferDisplay">Enter max drawdown and risk to calculate buffer.</div>
+        <div class="buffer-row" id="bufferDisplay">Enter data to calculate buffer.</div>
         <div class="items">
           <label class="check"><input type="checkbox" class="step"> <span class="c-text">Positive <b>R:R Ratio</b> confirmed</span></label>
           <label class="check"><input type="checkbox" class="step"> <span class="c-text">Targeting <b>Clear Liquidity</b> pool</span></label>
@@ -229,24 +207,21 @@
         </div>
       </div>
 
-      <!-- FINAL GATE -->
       <div class="panel gate" id="gate" style="grid-column: 1 / -1;">
         <div class="scan-line"></div>
         <div class="p-head"><span class="seq" style="background:var(--amber)">GATE</span><span class="p-name">Final Go / No-Go Gate</span></div>
         <div class="items" id="gateItems">
           <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">Inside my <b>Session Window</b>?</span></label>
-          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">Setup read confirmed from <b>HTF Gap</b>?</span></label>
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">Setup confirmed from <b>HTF Gap</b>?</span></label>
           <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">5m/15m gap <b>manipulated + swept</b>?</span></label>
-          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text"><b>Inversion confirmed</b> off highest-TF gap in that specific leg?</span></label>
-          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">This is the trade I <b>planned for</b> (Not a chase)?</span></label>
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text"><b>Inversion confirmed</b> off highest-TF gap?</span></label>
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">This is the trade I <b>planned for</b>?</span></label>
         </div>
       </div>
     </div>
 
-    <!-- DYNAMIC FLOW SECTION: ALERT & JOURNAL -->
     <div id="bottom-flow">
       <div id="exec-alert">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
-      
       <div id="journal-area">
         <div class="grid">
           <div class="panel" style="grid-column: 1 / -1;">
@@ -255,17 +230,17 @@
               <div class="field-group"><label>HTF Bias Logic</label><textarea id="j-htf" rows="4"></textarea></div>
               <div class="field-group"><label>LTF Target & Liquidity</label><textarea id="j-ltf" rows="4"></textarea></div>
             </div>
-            <div class="field-group"><label>Entry Model & Exact Time</label><input type="text" id="j-entry" placeholder="e.g. 1m IFVG at 10:42 NY"></div>
+            <div class="field-group"><label>Entry Details (Model/Time)</label><input type="text" id="j-entry"></div>
           </div>
 
           <div class="panel">
             <div class="p-head"><span class="seq">PSY</span><span class="p-name">Psychology Review</span></div>
-            <div class="field-group"><label>Morning Routine / Wake Up Time</label><input type="text" id="j-wake"></div>
+            <div class="field-group"><label>Morning Routine / Wake Up</label><input type="text" id="j-wake"></div>
             <div class="field-group"><label>Feelings (Pre / During / After)</label><textarea id="j-feelings" rows="5"></textarea></div>
           </div>
 
           <div class="panel">
-            <div class="p-head"><span class="seq">IMG</span><span class="p-name">Trade Screenshot</span></div>
+            <div class="p-head"><span class="seq">IMG</span><span class="p-name">Chart Snapshot</span></div>
             <div class="screenshot-zone" onclick="document.getElementById('file-input').click()">
               <img id="preview-img" src="" style="display:none;">
               <span id="upload-hint">Upload chart screenshot</span>
@@ -276,49 +251,47 @@
           <div class="panel" style="grid-column: 1 / -1;">
             <div class="p-head"><span class="seq">REF</span><span class="p-name">Reflection</span></div>
             <div class="items" style="display:flex; gap:20px; border-bottom:1px solid var(--panel-2);">
-              <label class="check"><input type="checkbox" id="j-rules"> <span class="c-text">Followed All Rules</span></label>
-              <label class="check"><input type="checkbox" id="j-emotions"> <span class="c-text">Emotions Controlled</span></label>
+              <label class="check"><input type="checkbox" id="j-rules"> <span class="c-text">Followed Rules</span></label>
+              <label class="check"><input type="checkbox" id="j-emotions"> <span class="c-text">Controlled Emotions</span></label>
             </div>
             <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
-              <div class="field-group"><label>Rule Breaks / Mistakes</label><textarea id="j-broken" rows="3"></textarea></div>
-              <div class="field-group"><label>Next Time Improvement</label><textarea id="j-better" rows="3"></textarea></div>
+              <div class="field-group"><label>Rule Breaks</label><textarea id="j-broken" rows="3"></textarea></div>
+              <div class="field-group"><label>Improvements</label><textarea id="j-better" rows="3"></textarea></div>
             </div>
           </div>
         </div>
       </div>
-
       <footer class="footer-actions">
-        <button class="btn btn-save" onclick="saveAsPhoto()">Download Journal Photo</button>
+        <button class="btn btn-commit" onclick="commitToHistory()">Commit to Internal History</button>
+        <button class="btn btn-save" onclick="saveAsPhoto()">Save Journal Photo</button>
         <button class="btn btn-reset" onclick="resetSession()">Reset Console</button>
       </footer>
     </div>
   </main>
 
-  <!-- HISTORY PAGE -->
+  <!-- PAGE 2: HISTORY -->
   <main id="page-journal" class="page">
-    <div class="panel" style="padding:40px; text-align:center; color:var(--ink-faint); font-family:var(--mono);">
-      Archived trades will appear here. Active trade data is found on the Execution page during GO-TIME.
+    <div id="history-container">
+      <!-- Trades render here -->
     </div>
   </main>
 </div>
 
 <script>
-  // Navigation
   function switchPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('page-' + id).classList.add('active');
     document.getElementById('btn-' + id).classList.add('active');
+    if(id === 'journal') renderHistory();
   }
 
-  // Setup Type Toggle
   function setSetup(type) {
     document.body.setAttribute('data-setup', type);
     document.getElementById('btn-cont').classList.toggle('active', type === 'continuation');
     document.getElementById('btn-rev').classList.toggle('active', type === 'reversal');
   }
 
-  // Master Checklist Engine
   const steps = document.querySelectorAll('.step');
   const gateSteps = document.querySelectorAll('.gate-step');
   const master = document.getElementById('master');
@@ -331,8 +304,7 @@
     const sDone = Array.from(steps).filter(s => s.checked).length;
     const gDone = Array.from(gateSteps).filter(s => s.checked).length;
     
-    // Arm Gate if S1-S4 are checked
-    if (sDone === steps.length) {
+    if (sCount = sDone === steps.length) {
       gate.classList.add('armed');
       gateSteps.forEach(gs => gs.disabled = false);
       mstatus.innerText = "STANDBY";
@@ -341,15 +313,13 @@
       gate.classList.remove('armed');
       gateSteps.forEach(gs => { gs.disabled = true; gs.checked = false; });
       mstatus.innerText = "NO-GO";
-      mmsg.innerText = "Complete sections S1 through S4 to arm the gate.";
+      mmsg.innerText = "Complete S1–S4 to arm the gate.";
     }
 
-    // TRIGGER GO-TIME FLOW
     if (sDone === steps.length && gDone === gateSteps.length) {
       mstatus.innerText = "GO";
       mstatus.style.color = "var(--green)";
       flow.style.display = "block";
-      // Auto-scroll to alert
       window.scrollTo({ top: document.getElementById('exec-alert').offsetTop - 50, behavior: 'smooth' });
     } else {
       mstatus.style.color = "var(--ink)";
@@ -359,80 +329,109 @@
 
   [...steps, ...gateSteps].forEach(s => s.addEventListener('change', updateMaster));
 
-  // Risk Buffer
   function calcBuffer() {
     const dd = parseFloat(document.getElementById('maxDD').value);
     const rpt = parseFloat(document.getElementById('riskPerTrade').value);
     const disp = document.getElementById('bufferDisplay');
     if (dd > 0 && rpt > 0) {
       const buffer = Math.floor(dd / rpt);
-      disp.innerHTML = `Buffer survives <b>${buffer}</b> consecutive losing trades before account failure.`;
+      disp.innerHTML = `Buffer survives <b>${buffer}</b> consecutive losing trades.`;
     } else {
-      disp.innerText = "Enter max drawdown and risk to calculate buffer.";
+      disp.innerText = "Enter data to calculate buffer.";
     }
   }
 
-  // Time & Session Engine (9:30 - 11:00 AM NY)
   function tick() {
     const now = new Date();
     document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-
-    // NY Time Check
     const nyStr = now.toLocaleString("en-US", {timeZone: "America/New_York"});
     const nyDate = new Date(nyStr);
     const nyMins = (nyDate.getHours() * 60) + nyDate.getMinutes();
-
-    const start = (9 * 60) + 30; // 9:30 AM
-    const end = 11 * 60;        // 11:00 AM
-
+    const start = (9 * 60) + 30; const end = 11 * 60;
     const isIn = nyMins >= start && nyMins <= end;
     const tag = document.getElementById('session-status');
     const range = document.getElementById('local-range');
-
     tag.innerText = isIn ? "IN WINDOW (NY AM)" : "OUTSIDE WINDOW";
     tag.className = isIn ? "session-tag tag-in" : "session-tag tag-out";
     range.className = isIn ? "range-in" : "range-out";
-
-    // Local Calculation
     const diff = now.getTime() - nyDate.getTime();
     const localStart = new Date(nyDate.setHours(9, 30, 0, 0) + diff);
     const localEnd = new Date(nyDate.setHours(11, 0, 0, 0) + diff);
     const opts = { hour: '2-digit', minute: '2-digit', hour12: true };
     range.innerText = `LOCAL: ${localStart.toLocaleTimeString([], opts)} - ${localEnd.toLocaleTimeString([], opts)}`;
   }
-  setInterval(tick, 1000);
-  tick();
+  setInterval(tick, 1000); tick();
 
-  // Screenshot Upload
   function handlePreview(input) {
     const file = input.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = e => {
         const img = document.getElementById('preview-img');
-        img.src = e.target.result;
-        img.style.display = 'block';
+        img.src = e.target.result; img.style.display = 'block';
         document.getElementById('upload-hint').style.display = 'none';
       };
       reader.readAsDataURL(file);
     }
   }
 
-  // PHOTO EXPORT (html2canvas)
+  // --- INTERNAL HISTORY ENGINE ---
+  function commitToHistory() {
+    const trade = {
+      id: Date.now(),
+      date: new Date().toLocaleString(),
+      bias: document.getElementById('biasInput').value,
+      entry: document.getElementById('j-entry').value,
+      rules: document.getElementById('j-rules').checked,
+      emotions: document.getElementById('j-emotions').checked,
+      logic: document.getElementById('j-htf').value,
+      reflection: document.getElementById('j-better').value
+    };
+
+    let history = JSON.parse(localStorage.getItem('fex_history') || '[]');
+    history.unshift(trade);
+    localStorage.setItem('fex_history', JSON.stringify(history));
+    alert("Trade Committed to Internal History.");
+  }
+
+  function renderHistory() {
+    const container = document.getElementById('history-container');
+    const history = JSON.parse(localStorage.getItem('fex_history') || '[]');
+    
+    if (history.length === 0) {
+      container.innerHTML = '<div class="panel" style="padding:40px; text-align:center; color:var(--ink-faint); font-family:var(--mono);">No saved trades found.</div>';
+      return;
+    }
+
+    container.innerHTML = history.map(t => `
+      <div class="history-card">
+        <div class="h-date">${t.date}</div>
+        <div class="h-meta">
+          <span class="h-tag" style="color:${t.rules ? 'var(--green)' : 'var(--red)'}">${t.rules ? 'Rules Followed' : 'Rules Broken'}</span>
+          <span class="h-tag">${t.emotions ? 'Emotional Control: OK' : 'Emotions: Compromised'}</span>
+        </div>
+        <div style="font-size:13px; margin-bottom:10px;"><b>Bias:</b> ${t.bias || 'N/A'}</div>
+        <div style="font-size:13px; margin-bottom:10px;"><b>Model:</b> ${t.entry || 'N/A'}</div>
+        <div style="font-size:12px; color:var(--ink-dim); white-space: pre-wrap;"><b>Analysis:</b> ${t.logic || 'None recorded'}</div>
+      </div>
+    `).join('');
+  }
+
   function saveAsPhoto() {
     const target = document.getElementById('journal-area');
     html2canvas(target, { backgroundColor: "#D1D4DC", scale: 2, useCORS: true }).then(canvas => {
       const link = document.createElement('a');
-      link.download = `FeX_TradeLog_${Date.now()}.png`;
+      link.download = `FeX_Journal_${Date.now()}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     });
   }
 
   function resetSession() {
-    if(confirm("Confirm reset? All current data will be cleared.")) window.location.reload();
+    if(confirm("Wipe current console?")) window.location.reload();
   }
-</script>
 
+  window.onload = () => { if(window.location.hash === '#journal') switchPage('journal'); };
+</script>
 </body>
 </html>
