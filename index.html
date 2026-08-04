@@ -3,21 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>FeXecutioner | Trading Console</title>
+<title>FeXecutioner | Console</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #D1D4DC; /* Chart Background */
-    --panel: #FFFFFF; /* Upclose / Clean Surface */
-    --panel-2: #f8f9fa;
-    --line: #787B86; /* Downclose / Muted Borders */
+    --panel: #FFFFFF; /* Upclose */
+    --panel-2: #f0f1f5;
+    --line: #787B86; /* Downclose */
     --line-bright: #FFFFFF;
     --ink: #050505;
     --ink-dim: #34363b;
     --ink-faint: #686b72;
-    --accent: #050505;
     --green: #27D38C;
     --amber: #E9A23B;
     --red: #E8554E;
@@ -27,362 +26,333 @@
   }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; min-height: 100vh; }
   body {
     background: var(--bg);
     color: var(--ink);
     font-family: var(--body);
     font-size: 15px;
-    line-height: 1.5;
-    padding: 28px 22px 60px;
+    margin: 0;
+    padding: 20px 15px 60px;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* SVG Decoration Overlay - matching original style */
-  body::before {
-    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background-image: 
-      linear-gradient(var(--line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size: 50px 50px;
-    opacity: 0.1;
-    mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 80%);
-  }
-
-  .wrap { max-width: 1000px; margin: 0 auto; position: relative; z-index: 1; }
+  .wrap { max-width: 1000px; margin: 0 auto; position: relative; }
 
   /* Navigation Tabs */
-  .console-nav {
-    display: flex; gap: 2px; margin-bottom: 20px;
-    background: var(--line); padding: 2px; border-radius: 4px;
-  }
-  .nav-btn {
-    flex: 1; background: var(--bg); border: none; padding: 12px;
-    font-family: var(--mono); font-weight: 700; font-size: 12px;
-    text-transform: uppercase; cursor: pointer; color: var(--ink-faint);
-    transition: 0.2s;
+  .mode-nav { display: flex; gap: 2px; background: var(--line); padding: 2px; border-radius: 4px; margin-bottom: 20px; }
+  .nav-btn { 
+    flex: 1; background: var(--bg); border: none; padding: 12px; 
+    font-family: var(--mono); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 11px;
   }
   .nav-btn.active { background: var(--ink); color: var(--panel); }
 
-  /* Header / Telemetry */
-  .head {
-    display: flex; justify-content: space-between; align-items: flex-end;
-    border-bottom: 2px solid var(--ink); padding-bottom: 16px; margin-bottom: 22px;
-  }
-  .brand .eyebrow {
-    font-family: var(--mono); font-size: 11px; letter-spacing: .3em;
-    color: var(--ink-dim); text-transform: uppercase; margin-bottom: 4px;
-  }
-  .brand h1 { font-family: var(--disp); font-weight: 700; font-size: 32px; margin: 0; line-height: 1; }
+  /* Header */
+  .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 20px; }
+  .brand h1 { font-family: var(--disp); font-size: 28px; margin: 0; text-transform: uppercase; }
   .telemetry { text-align: right; font-family: var(--mono); }
-  .clock { font-size: 26px; font-weight: 600; line-height: 1; letter-spacing: 1px; }
-  .date { font-size: 11px; color: var(--ink-faint); text-transform: uppercase; margin-top: 5px; }
+  .clock { font-size: 24px; font-weight: 600; line-height: 1; }
 
-  /* Master Status Bar */
+  /* Master Console */
   .master {
-    position: relative; border: 1px solid var(--ink);
-    background: var(--panel); border-radius: 4px; padding: 24px 30px;
-    margin-bottom: 26px; overflow: hidden;
-    box-shadow: 6px 6px 0px var(--line);
+    position: relative; border: 1px solid var(--ink); background: var(--panel); 
+    padding: 24px; border-radius: 4px; margin-bottom: 20px; box-shadow: 6px 6px 0 var(--line);
+    transition: 0.3s;
   }
-  .master .corner { position: absolute; width: 12px; height: 12px; border: 1px solid var(--line); opacity: 0.5; }
-  .master .corner.tl { top: 8px; left: 8px; border-right: 0; border-bottom: 0; }
-  .master .corner.tr { top: 8px; right: 8px; border-left: 0; border-bottom: 0; }
-  .master .corner.bl { bottom: 8px; left: 8px; border-right: 0; border-top: 0; }
-  .master .corner.br { bottom: 8px; right: 8px; border-left: 0; border-top: 0; }
-
-  .m-top { display: flex; align-items: center; gap: 16px; }
-  .m-led { width: 14px; height: 14px; border-radius: 50%; background: var(--ink-faint); transition: 0.3s; }
-  .m-status { font-family: var(--disp); font-weight: 700; font-size: 48px; line-height: 1; }
+  .m-status { font-family: var(--disp); font-size: 44px; font-weight: 700; line-height: 1; }
+  .m-msg { font-size: 13px; color: var(--ink-faint); margin-top: 10px; font-family: var(--mono); }
   
-  .execution-trigger {
-    display: none; background: var(--ink); color: var(--panel);
-    padding: 12px; text-align: center; font-family: var(--mono);
-    font-weight: 700; margin-top: 20px; letter-spacing: 1px;
-    animation: alertPulse 1.5s infinite;
+  #exec-alert {
+    display: none; background: var(--ink); color: var(--panel); padding: 12px; 
+    text-align: center; font-family: var(--mono); font-weight: 700; margin-top: 20px;
+    animation: blink 1.5s infinite;
   }
-  @keyframes alertPulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+  @keyframes blink { 50% { opacity: 0.6; } }
 
-  .master.go .m-led { background: var(--green); box-shadow: 0 0 12px var(--green); }
-  .master.go .m-status { color: var(--ink); }
-
-  /* Main Grids */
+  /* Grid & Panels */
   .page { display: none; }
   .page.active { display: block; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
   .panel { border: 1px solid var(--line); background: var(--panel); border-radius: 4px; overflow: hidden; }
-  .p-head {
-    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-    border-bottom: 1px solid var(--line); background: var(--panel-2);
-  }
-  .seq {
-    font-family: var(--mono); font-size: 11px; font-weight: 700;
-    background: var(--ink); color: var(--panel); padding: 2px 8px; border-radius: 2px;
-  }
-  .p-name { font-family: var(--disp); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+  .p-head { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); }
+  .seq { background: var(--ink); color: var(--panel); font-family: var(--mono); font-size: 10px; padding: 2px 6px; border-radius: 2px; }
+  .p-name { font-family: var(--disp); font-weight: 700; font-size: 13px; text-transform: uppercase; }
 
-  /* Checkbox Styles */
-  .items { padding: 8px; }
-  .check {
-    display: flex; gap: 12px; align-items: flex-start; padding: 10px;
-    border-radius: 3px; cursor: pointer; transition: 0.15s;
-  }
+  /* Checkboxes */
+  .check { display: flex; gap: 12px; padding: 10px; cursor: pointer; transition: 0.2s; align-items: flex-start; }
   .check:hover { background: var(--panel-2); }
   .check input { width: 18px; height: 18px; accent-color: var(--ink); margin-top: 2px; }
-  .c-text { font-size: 14px; color: var(--ink-dim); font-weight: 500; }
-  .c-text b { color: var(--ink); font-weight: 700; }
-  .c-text .note { display: block; font-size: 11px; color: var(--ink-faint); font-family: var(--mono); margin-top: 2px; }
+  .c-text { font-size: 14px; line-height: 1.4; }
+  .c-text b { font-weight: 700; }
+  .note { display: block; font-size: 11px; color: var(--ink-faint); font-family: var(--mono); margin-top: 2px; }
 
-  /* Form Elements */
-  .field-group { padding: 16px; border-bottom: 1px solid var(--panel-2); }
-  label {
-    display: block; font-family: var(--mono); font-size: 10px;
-    text-transform: uppercase; color: var(--ink-faint); font-weight: 700; margin-bottom: 6px;
-  }
+  /* Inputs */
+  .field-group { padding: 12px; border-bottom: 1px solid var(--panel-2); }
+  label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 5px; }
   textarea, input[type="text"], input[type="number"] {
-    width: 100%; border: 1px solid var(--line); background: var(--panel-2);
-    padding: 10px; font-family: var(--body); font-size: 13px; color: var(--ink);
-    border-radius: 2px;
+    width: 100%; border: 1px solid var(--line); background: var(--panel-2); padding: 10px; font-family: var(--body); font-size: 13px; border-radius: 2px;
   }
-  textarea:focus { outline: 1px solid var(--ink); background: var(--panel); }
+
+  /* Screenshot Placement */
+  .screenshot-zone {
+    border: 2px dashed var(--line); background: var(--panel-2); height: 200px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; overflow: hidden;
+  }
+  .screenshot-zone img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+  .screenshot-zone span { font-family: var(--mono); font-size: 11px; color: var(--line); }
+
+  /* Final Gate Animation */
+  .gate { border: 2px solid var(--line); position: relative; overflow: hidden; }
+  .gate.armed { border-color: var(--green); box-shadow: 0 0 15px rgba(39, 211, 140, 0.2); }
+  .scan-line {
+    position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(39, 211, 140, 0.1), transparent);
+    pointer-events: none;
+  }
+  .gate.armed .scan-line { animation: scan 2s linear infinite; }
+  @keyframes scan { from { left: -100%; } to { left: 100%; } }
 
   /* Buttons */
-  .actions { display: flex; gap: 12px; margin-top: 30px; }
-  .btn {
-    padding: 14px 28px; font-family: var(--mono); font-weight: 700;
-    text-transform: uppercase; border: 1px solid var(--ink); cursor: pointer; border-radius: 4px;
+  .footer-actions { display: flex; gap: 10px; margin-top: 30px; }
+  .btn { 
+    flex: 1; padding: 15px; font-family: var(--mono); font-weight: 700; border-radius: 4px;
+    cursor: pointer; text-transform: uppercase; border: 1px solid var(--ink);
   }
-  .btn-primary { background: var(--ink); color: var(--panel); }
-  .btn-outline { background: transparent; color: var(--ink-faint); border-color: var(--line); }
-  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .btn-save { background: var(--ink); color: var(--panel); }
+  .btn-reset { background: transparent; color: var(--ink-faint); border-color: var(--line); }
 
-  @media (max-width: 768px) {
-    .grid { grid-template-columns: 1fr; }
-    .head { flex-direction: column; align-items: flex-start; gap: 15px; }
-    .m-status { font-size: 36px; }
-  }
+  @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
 <div class="wrap">
-  <nav class="console-nav">
-    <button class="nav-btn active" onclick="switchPage('exec')">Execution Mode</button>
-    <button class="nav-btn" onclick="switchPage('journal')">Journal Mode</button>
+  <nav class="mode-nav">
+    <button class="nav-btn active" id="btn-exec" onclick="switchPage('exec')">Execution Mode</button>
+    <button class="nav-btn" id="btn-journal" onclick="switchPage('journal')">Journal Mode</button>
   </nav>
 
   <header class="head">
     <div class="brand">
-      <div class="eyebrow">Institutional Execution</div>
-      <h1>FeXecutioner</h1>
+      <div style="font-family:var(--mono); font-size:10px; letter-spacing:3px; color:var(--line);">FeXecutioner</div>
+      <h1>CONSOLE</h1>
     </div>
     <div class="telemetry">
       <div class="clock" id="clock">00:00:00</div>
-      <div class="date" id="date">AUG 03 2026</div>
+      <div id="date" style="font-size:11px; font-family:var(--mono); color:var(--ink-faint);">04 AUG 2026</div>
     </div>
   </header>
 
   <section class="master" id="master">
-    <span class="corner tl"></span><span class="corner tr"></span>
-    <span class="corner bl"></span><span class="corner br"></span>
-    <div class="m-top">
-      <span class="m-led"></span>
-      <span class="m-status" id="mstatus">NO-GO</span>
-    </div>
-    <div class="execution-trigger" id="execTrigger">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
+    <div class="m-status" id="mstatus">NO-GO</div>
+    <div class="m-msg" id="mmsg">Complete S1–S4 to arm the execution gate.</div>
+    <div id="exec-alert">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
   </section>
 
-  <!-- PAGE: EXECUTION -->
+  <!-- PAGE 1: EXECUTION -->
   <main id="page-exec" class="page active">
     <div class="grid">
-      <!-- Technicals -->
+      <!-- S1 -->
       <div class="panel">
-        <div class="p-head"><span class="seq">S1</span><span class="p-name">Technical Alignment</span></div>
-        <div class="items">
-          <label class="check"><input type="checkbox" class="exec-step"> <span class="c-text"><b>HTF Bias</b> Confirmed (1H/4H)<span class="note">Price bouncing off key HTF PD Array</span></span></label>
-          <label class="check"><input type="checkbox" class="exec-step"> <span class="c-text"><b>LTF Levels</b> Respected<span class="note">Levels hit/respected in bias direction</span></span></label>
-          <label class="check"><input type="checkbox" class="exec-step"> <span class="c-text"><b>Manipulation</b> leg swept liquidity<span class="note">Internal or session liquidity taken</span></span></label>
-        </div>
-      </div>
-
-      <!-- Precision -->
-      <div class="panel">
-        <div class="p-head"><span class="seq">S2</span><span class="p-name">Precision & Entry</span></div>
-        <div class="items">
-          <label class="check"><input type="checkbox" class="exec-step"> <span class="c-text"><b>Inversion FVG</b> Confirmed (1m-5m)<span class="note">Entry model formed and printed</span></span></label>
-          <label class="check"><input type="checkbox" class="exec-step"> <span class="c-text">Inversion created in <b>≤ 3 candles</b><span class="note">High displacement confirmed</span></span></label>
-          <label class="check"><input type="checkbox" class="exec-step"> <span class="c-text">Within <b>Session Window</b><span class="note">NY AM / Silver Bullet / PM Session</span></span></label>
-        </div>
-      </div>
-
-      <!-- Risk Management -->
-      <div class="panel">
-        <div class="p-head"><span class="seq">S3</span><span class="p-name">Risk Controls</span></div>
+        <div class="p-head"><span class="seq">S1</span><span class="p-name">Bias & HTF Gap</span></div>
         <div class="field-group">
-          <label>Contract Size & Risk ($)</label>
-          <input type="text" id="riskInput" placeholder="e.g. 2 MNQ - $400 risk">
+          <label>Mark Today's Bias</label>
+          <input type="text" id="biasInput" placeholder="e.g. Bullish - swept Asia low...">
         </div>
         <div class="items">
-          <label class="check"><input type="checkbox" class="exec-step"> <span class="c-text">Positive <b>R:R Ratio</b><span class="note">Logic for profit > logic for risk</span></span></label>
-          <label class="check"><input type="checkbox" class="exec-step"> <span class="c-text">Clear <b>Liquidity Pool</b> target</span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Checked <b>Premarket price action</b></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Found the most recent <b>1H / 4H FVG</b></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Confirmed <b>Setup Type</b> (Cont/Rev)</span></label>
         </div>
       </div>
 
-      <!-- Psychology -->
+      <!-- S2 -->
       <div class="panel">
-        <div class="p-head"><span class="seq">S4</span><span class="p-name">Pre-Trade Psychology</span></div>
+        <div class="p-head"><span class="seq">S2</span><span class="p-name">Scale to 5m / 15m</span></div>
         <div class="items">
-          <label class="check"><input type="checkbox" class="exec-step"> <span class="c-text"><b>Patiently</b> waiting for the tap<span class="note">Not chasing the displacement</span></span></label>
-          <label class="check"><input type="checkbox" class="exec-step"> <span class="c-text">Mindset is <b>Objective</b><span class="note">I accept the risk before clicking</span></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Marked the <b>5m / 15m Gap</b><span class="note">This is the gap you will trade off of.</span></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Confirmed <b>Manipulation</b><span class="note">Price ran into gap and swept liquidity.</span></span></label>
+        </div>
+      </div>
+
+      <!-- S3 -->
+      <div class="panel">
+        <div class="p-head"><span class="seq">S3</span><span class="p-name">Inversion (1m-5m)</span></div>
+        <div class="items">
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Found the <b>Inversion</b> on 1-5m chart</span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Highest-TF gap in <b>Manipulation leg</b></span></label>
+        </div>
+      </div>
+
+      <!-- S4 -->
+      <div class="panel">
+        <div class="p-head"><span class="seq">S4</span><span class="p-name">Risk & Entry</span></div>
+        <div class="grid" style="grid-template-columns:1fr 1fr; border:none;">
+          <div class="field-group"><label>Risk $</label><input type="number" id="riskAmt"></div>
+          <div class="field-group"><label>Contracts</label><input type="number" id="contracts"></div>
+        </div>
+        <div class="items">
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Positive <b>R:R</b> ratio</span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Targeting <b>Clear Liquidity</b></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Inversion <b>≤ 3 candles</b></span></label>
+        </div>
+      </div>
+
+      <!-- FINAL GATE -->
+      <div class="panel gate" id="gate" style="grid-column: 1 / -1;">
+        <div class="scan-line"></div>
+        <div class="p-head"><span class="seq" style="background:var(--amber)">GO</span><span class="p-name">Final Go / No-Go Gate</span></div>
+        <div class="items" id="gateItems">
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">Inside my <b>Session Window</b>?</span></label>
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">Setup type read confirmed from <b>HTF Gap</b>?</span></label>
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">5m/15m gap <b>manipulated + swept</b>?</span></label>
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">This is the trade I <b>planned for</b>?</span></label>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- PAGE: JOURNAL -->
+  <!-- PAGE 2: JOURNAL -->
   <main id="page-journal" class="page">
     <div class="grid">
       <!-- Analysis -->
       <div class="panel" style="grid-column: 1 / -1;">
-        <div class="p-head"><span class="seq">S5</span><span class="p-name">Technical Review (Post-Trade)</span></div>
+        <div class="p-head"><span class="seq">S5</span><span class="p-name">Analysis</span></div>
         <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
-          <div class="field-group">
-            <label>HTF Bias Logic</label>
-            <textarea id="htfLogic" rows="4" placeholder="What was the HTF draw? Why were we bouncing?"></textarea>
-          </div>
-          <div class="field-group">
-            <label>LTF Targets & Liquidity</label>
-            <textarea id="ltfLogic" rows="4" placeholder="What levels were hit? What were we targeting?"></textarea>
-          </div>
+          <div class="field-group"><label>HTF Bias & Logic</label><textarea id="htfLog" rows="4" placeholder="What were we bouncing off?"></textarea></div>
+          <div class="field-group"><label>LTF Target & Liquidity</label><textarea id="ltfLog" rows="4" placeholder="What key levels got hit?"></textarea></div>
         </div>
-        <div class="field-group">
-          <label>Entry Model & Time</label>
-          <input type="text" id="entryDetails" placeholder="e.g. 2m IFVG Entry at 15:42 SAST">
-        </div>
+        <div class="field-group"><label>Entry Model & Time</label><input type="text" id="entryDetail" placeholder="Which inversion? What time?"></div>
       </div>
 
       <!-- Psychology -->
       <div class="panel">
-        <div class="p-head"><span class="seq">S6</span><span class="p-name">Routine & Feelings</span></div>
-        <div class="field-group">
-          <label>Wake up / Pre-Market Routine</label>
-          <input type="text" id="routine" placeholder="Time, routine, preparation steps...">
-        </div>
-        <div class="field-group">
-          <label>Feelings (Pre / During / After)</label>
-          <textarea id="emotions" rows="5" placeholder="How did my heart rate feel? Internal chatter?"></textarea>
+        <div class="p-head"><span class="seq">S6</span><span class="p-name">Psychology Section</span></div>
+        <div class="field-group"><label>Morning Routine</label><input type="text" id="wakeUp" placeholder="How early? Routine? Pre-market?"></div>
+        <div class="field-group"><label>Feelings (Pre/During/After)</label><textarea id="feelings" rows="5"></textarea></div>
+      </div>
+
+      <!-- Screenshot Placement -->
+      <div class="panel">
+        <div class="p-head"><span class="seq">IMG</span><span class="p-name">Screenshot Placement</span></div>
+        <div class="items">
+          <div class="screenshot-zone" onclick="document.getElementById('file-input').click()">
+            <img id="preview" src="" style="display:none;">
+            <span>Click to upload trade screenshot</span>
+            <input type="file" id="file-input" style="display:none;" onchange="handleImage(this)">
+          </div>
         </div>
       </div>
 
       <!-- Performance -->
-      <div class="panel">
-        <div class="p-head"><span class="seq">S7</span><span class="p-name">Rules & Improvements</span></div>
+      <div class="panel" style="grid-column: 1 / -1;">
+        <div class="p-head"><span class="seq">S7</span><span class="p-name">Performance Review</span></div>
         <div class="items">
-          <label class="check"><input type="checkbox" id="followedRules"> <span class="c-text"><b>Did I follow my rules?</b></span></label>
-          <label class="check"><input type="checkbox" id="emotionsControlled"> <span class="c-text"><b>Did my emotions get to me?</b></span></label>
+          <label class="check"><input type="checkbox" id="rulesCheck"> <span class="c-text">Did I follow my <b>Rules</b>?</span></label>
+          <label class="check"><input type="checkbox" id="emotionsCheck"> <span class="c-text">Did my <b>Emotions</b> get to me?</span></label>
         </div>
-        <div class="field-group">
-          <label>Rule Breaks / Mistakes</label>
-          <textarea id="mistakes" rows="2" placeholder="List any deviations from the plan..."></textarea>
-        </div>
-        <div class="field-group">
-          <label>Betterment Plan</label>
-          <textarea id="betterment" rows="2" placeholder="What can I do better next time?"></textarea>
+        <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
+          <div class="field-group"><label>Rules Broken</label><textarea id="rulesBroken" rows="3"></textarea></div>
+          <div class="field-group"><label>Next Time Improvement</label><textarea id="improvement" rows="3"></textarea></div>
         </div>
       </div>
     </div>
   </main>
 
-  <footer class="actions">
-    <button class="btn btn-primary" onclick="saveToJournal()">Save Trade to Memory</button>
-    <button class="btn btn-outline" onclick="resetConsole()">Reset Session</button>
+  <footer class="footer-actions">
+    <button class="btn btn-save" onclick="downloadTrade()">Save Trade File</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset Session</button>
   </footer>
 </div>
 
 <script>
   // Page Switching
-  function switchPage(pageId) {
+  function switchPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + pageId).classList.add('active');
-    event.currentTarget.classList.add('active');
+    document.getElementById('page-' + id).classList.add('active');
+    document.getElementById('btn-' + id).classList.add('active');
   }
 
-  // Checkbox & Master Logic
-  const steps = document.querySelectorAll('.exec-step');
+  // Execution Logic
+  const steps = document.querySelectorAll('.step');
+  const gateSteps = document.querySelectorAll('.gate-step');
   const master = document.getElementById('master');
   const mstatus = document.getElementById('mstatus');
-  const trigger = document.getElementById('execTrigger');
+  const mmsg = document.getElementById('mmsg');
+  const alertBox = document.getElementById('exec-alert');
+  const gate = document.getElementById('gate');
 
   function updateMaster() {
-    const checked = Array.from(steps).filter(s => s.checked).length;
-    const total = steps.length;
+    const sDone = Array.from(steps).filter(s => s.checked).length;
+    const gateDone = Array.from(gateSteps).filter(s => s.checked).length;
     
-    if (checked === total) {
-      master.classList.add('go');
-      mstatus.innerText = "GO";
-      trigger.style.display = "block";
+    // Enable/Disable gate
+    if (sDone === steps.length) {
+      gate.classList.add('armed');
+      gateSteps.forEach(gs => gs.disabled = false);
+      mstatus.innerText = "STANDBY";
+      mmsg.innerText = "Gate armed. Complete final Go/No-Go.";
     } else {
-      master.classList.remove('go');
+      gate.classList.remove('armed');
+      gateSteps.forEach(gs => { gs.disabled = true; gs.checked = false; });
       mstatus.innerText = "NO-GO";
-      trigger.style.display = "none";
+      mmsg.innerText = "Complete S1–S4 to arm the execution gate.";
     }
-    saveState();
+
+    // Final Go
+    if (sDone === steps.length && gateDone === gateSteps.length) {
+      mstatus.innerText = "GO";
+      mstatus.style.color = "var(--green)";
+      alertBox.style.display = "block";
+    } else {
+      mstatus.style.color = "var(--ink)";
+      alertBox.style.display = "none";
+    }
   }
 
-  steps.forEach(s => s.addEventListener('change', updateMaster));
+  [...steps, ...gateSteps].forEach(s => s.addEventListener('change', updateMaster));
 
-  // Persistence (LocalStorage)
-  const inputs = document.querySelectorAll('input, textarea');
-  
-  function saveState() {
-    const state = {
-      checks: Array.from(document.querySelectorAll('input[type="checkbox"]')).map(c => c.checked),
-      values: Array.from(document.querySelectorAll('input[type="text"], input[type="number"], textarea')).map(i => i.value)
-    };
-    localStorage.setItem('fex_console_data', JSON.stringify(state));
+  // Handle Image
+  function handleImage(input) {
+    const file = input.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const preview = document.getElementById('preview');
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
-  function loadState() {
-    const saved = localStorage.getItem('fex_console_data');
-    if (!saved) return;
-    const state = JSON.parse(saved);
+  // Download Data as File
+  function downloadTrade() {
+    const data = `FE-XECUTIONER TRADE LOG\nDATE: ${new Date().toLocaleString()}\n\n` +
+      `BIAS: ${document.getElementById('biasInput').value}\n` +
+      `RISK: $${document.getElementById('riskAmt').value}\n` +
+      `HTF LOGIC: ${document.getElementById('htfLog').value}\n` +
+      `PSYCHOLOGY: ${document.getElementById('feelings').value}\n` +
+      `RULES FOLLOWED: ${document.getElementById('rulesCheck').checked ? 'YES' : 'NO'}\n` +
+      `IMPROVEMENTS: ${document.getElementById('improvement').value}`;
     
-    document.querySelectorAll('input[type="checkbox"]').forEach((c, i) => {
-      c.checked = state.checks[i];
-    });
-    document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach((input, i) => {
-      input.value = state.values[i];
-    });
-    updateMaster();
+    const blob = new Blob([data], { type: 'text/plain' });
+    const anchor = document.createElement('a');
+    anchor.download = `Trade_${Date.now()}.txt`;
+    anchor.href = window.URL.createObjectURL(blob);
+    anchor.click();
   }
 
-  inputs.forEach(i => i.addEventListener('input', saveState));
-
-  function resetConsole() {
-    if (confirm("Reset everything for a new session?")) {
-      localStorage.removeItem('fex_console_data');
-      window.location.reload();
-    }
+  function resetAll() {
+    if(confirm("Reset entire console?")) window.location.reload();
   }
 
-  function saveToJournal() {
-    alert("Trade data saved to browser memory. Take a screenshot now for your permanent journal.");
-  }
-
-  // Telemetry Clock
-  function updateClock() {
-    const now = new Date();
-    document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-    const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-    document.getElementById('date').innerText = now.toLocaleDateString('en-GB', options).toUpperCase();
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
-
-  // Initialize
-  window.onload = loadState;
+  // Clock
+  setInterval(() => {
+    document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  }, 1000);
 </script>
 </body>
 </html>
