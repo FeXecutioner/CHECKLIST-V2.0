@@ -3,19 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>FeXecutioner | Trading Console</title>
+<title>FeXecutioner | Console</title>
 
-<!-- External Libraries for Fonts and Image Capture -->
+<!-- External Libraries -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Required for the "Save as Photo" feature -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
   :root {
-    --bg: #D1D4DC; /* Chart Background */
+    --bg: #D1D4DC; /* Your Chart Canvas */
     --panel: #FFFFFF; /* Upclose Candles */
-    --panel-2: #f4f5f8;
+    --panel-2: #e9ebf0;
     --line: #787B86; /* Downclose Candles */
     --ink: #050505;
     --ink-dim: #34363b;
@@ -40,36 +41,31 @@
 
   .wrap { max-width: 1000px; margin: 0 auto; position: relative; }
 
-  /* Navigation */
+  /* Tab Navigation */
   .mode-nav { display: flex; gap: 2px; background: var(--line); padding: 2px; border-radius: 4px; margin-bottom: 20px; }
   .nav-btn { 
     flex: 1; background: var(--bg); border: none; padding: 14px; 
     font-family: var(--mono); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 11px;
-    transition: 0.2s;
   }
   .nav-btn.active { background: var(--ink); color: var(--panel); }
 
-  /* Header */
+  /* Header Section */
   .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 20px; }
   .brand h1 { font-family: var(--disp); font-size: 32px; margin: 0; text-transform: uppercase; line-height: 1; }
   .telemetry { text-align: right; font-family: var(--mono); }
   .clock { font-size: 26px; font-weight: 600; line-height: 1; }
   .session-tag { font-size: 10px; text-transform: uppercase; font-weight: 700; margin-top: 5px; padding: 4px 8px; border-radius: 2px; display: inline-block; }
   .tag-out { background: var(--line); color: white; }
-  .tag-in { background: var(--green); color: var(--ink); box-shadow: 0 0 10px rgba(39,211,140,0.3); }
+  .tag-in { background: var(--green); color: var(--ink); }
 
-  /* Master Status */
+  /* Master Console Display */
   .master {
     position: relative; border: 1px solid var(--ink); background: var(--panel); 
     padding: 24px; border-radius: 4px; margin-bottom: 20px; box-shadow: 6px 6px 0 var(--line);
   }
-  .master .bracket { position: absolute; width: 15px; height: 15px; border: 1px solid var(--line); opacity: 0.4; }
-  .master .tl { top: 8px; left: 8px; border-right: 0; border-bottom: 0; }
-  .master .tr { top: 8px; right: 8px; border-left: 0; border-bottom: 0; }
-  .master .bl { bottom: 8px; left: 8px; border-right: 0; border-top: 0; }
-  .master .br { bottom: 8px; right: 8px; border-left: 0; border-top: 0; }
-
   .m-status { font-family: var(--disp); font-size: 52px; font-weight: 700; line-height: 1; }
+  .m-msg { font-size: 13px; color: var(--ink-faint); margin-top: 10px; font-family: var(--mono); }
+  
   #exec-alert {
     display: none; background: var(--ink); color: var(--panel); padding: 15px; 
     text-align: center; font-family: var(--mono); font-weight: 700; margin-top: 20px;
@@ -77,7 +73,7 @@
   }
   @keyframes blink { 50% { opacity: 0.5; } }
 
-  /* Grid Layout */
+  /* Grid & Panel Layout */
   .page { display: none; }
   .page.active { display: block; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -87,12 +83,12 @@
   .seq { background: var(--ink); color: var(--panel); font-family: var(--mono); font-size: 10px; padding: 2px 6px; border-radius: 2px; }
   .p-name { font-family: var(--disp); font-weight: 700; font-size: 14px; text-transform: uppercase; }
 
-  /* Setup Toggle */
+  /* Continuation / Reversal Toggle */
   .setup-toggle { display: flex; gap: 5px; padding: 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); }
   .s-btn { flex: 1; padding: 8px; font-family: var(--mono); font-size: 10px; font-weight: 700; border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; background: var(--panel); }
   .s-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
 
-  /* Items */
+  /* Detailed Checklist Items */
   .check { display: flex; gap: 12px; padding: 12px; cursor: pointer; transition: 0.2s; align-items: flex-start; }
   .check:hover { background: var(--panel-2); }
   .check input { width: 19px; height: 19px; accent-color: var(--ink); margin-top: 2px; }
@@ -100,20 +96,20 @@
   .c-text b { font-weight: 700; color: var(--ink); }
   .note { display: block; font-size: 11px; color: var(--ink-faint); font-family: var(--mono); margin-top: 4px; }
 
-  /* Dynamic Note Colors */
+  /* Logic for dynamic sub-notes */
   .note-continuation { color: var(--green); display: none; }
   .note-reversal { color: var(--amber); display: none; }
   body[data-setup="continuation"] .note-continuation { display: block; }
   body[data-setup="reversal"] .note-reversal { display: block; }
 
-  /* Inputs */
+  /* Input Fields */
   .field-group { padding: 12px; border-bottom: 1px solid var(--panel-2); }
   label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
   textarea, input[type="text"], input[type="number"] {
     width: 100%; border: 1px solid var(--line); background: var(--panel-2); padding: 12px; font-family: var(--body); font-size: 13px; border-radius: 2px; color: var(--ink);
   }
 
-  /* Gate Scan */
+  /* The Gate (Original Scanning Animation) */
   .gate { position: relative; border: 2px solid var(--line); transition: 0.5s; }
   .gate.armed { border-color: var(--green); }
   .scan-line {
@@ -124,26 +120,23 @@
   .gate.armed .scan-line { animation: scan 2.5s linear infinite; }
   @keyframes scan { from { left: -100%; } to { left: 100%; } }
 
-  /* Journal Screenshot */
-  .screenshot-area {
+  /* Journal-Specific Styling */
+  #journal-capture-area { padding: 20px; background: var(--bg); }
+  .screenshot-placeholder {
     border: 2px dashed var(--line); background: var(--panel-2); min-height: 250px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; position: relative; margin: 12px; border-radius: 4px;
+    cursor: pointer; position: relative; margin: 12px; border-radius: 4px; overflow: hidden;
   }
-  .screenshot-area img { max-width: 100%; max-height: 400px; border-radius: 2px; }
-  .screenshot-area span { font-family: var(--mono); font-size: 11px; color: var(--line); margin-top: 10px; }
+  .screenshot-placeholder img { max-width: 100%; height: auto; display: block; }
 
-  /* Export Button */
+  /* Buttons */
   .footer-actions { display: flex; gap: 10px; margin-top: 40px; }
   .btn { 
     flex: 1; padding: 18px; font-family: var(--mono); font-weight: 700; border-radius: 4px;
     cursor: pointer; text-transform: uppercase; border: 1px solid var(--ink); font-size: 12px;
   }
-  .btn-save { background: var(--ink); color: var(--panel); border: none; }
+  .btn-save { background: var(--ink); color: var(--panel); }
   .btn-reset { background: transparent; color: var(--ink-faint); border-color: var(--line); }
-
-  /* Export Capture Styling */
-  #journal-capture { padding: 20px; background: var(--bg); }
 
   @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 </style>
@@ -169,14 +162,12 @@
   </header>
 
   <section class="master" id="master">
-    <span class="bracket tl"></span><span class="bracket tr"></span>
-    <span class="bracket bl"></span><span class="bracket br"></span>
     <div class="m-status" id="mstatus">NO-GO</div>
-    <div id="mmsg" style="font-family:var(--mono); font-size:12px; color:var(--ink-faint); margin-top:5px;">Work through S1–S4 to arm the gate.</div>
+    <div class="m-msg" id="mmsg">Complete S1–S4 to arm the execution gate.</div>
     <div id="exec-alert">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
   </section>
 
-  <!-- PAGE 1: EXECUTION -->
+  <!-- PAGE 1: EXECUTION MODE -->
   <main id="page-exec" class="page active">
     <div class="grid">
       
@@ -184,16 +175,16 @@
       <div class="panel">
         <div class="p-head"><span class="seq">S1</span><span class="p-name">Bias & HTF Gap</span></div>
         <div class="setup-toggle">
-          <button class="s-btn active" onclick="setSetup('continuation')">Continuation</button>
-          <button class="s-btn" onclick="setSetup('reversal')">Reversal</button>
+          <button class="s-btn active" id="btn-cont" onclick="setSetup('continuation')">Continuation</button>
+          <button class="s-btn" id="btn-rev" onclick="setSetup('reversal')">Reversal</button>
         </div>
         <div class="field-group">
           <label>Mark Today's Bias</label>
           <input type="text" id="biasInput" placeholder="HTF Bias and Reasoning...">
         </div>
         <div class="items">
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Checked <b>Premarket price action</b><span class="note">Reviewed overnight highs/lows and VWAP.</span></span></label>
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Found the most recent <b>1H / 4H FVG</b><span class="note">The specific anchor price is reacting to.</span></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Checked <b>Premarket price action</b><span class="note">Reviewed overnight highs/lows and premarket VWAP.</span></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Found the most recent <b>1H / 4H FVG</b><span class="note">The higher timeframe fair value gap price is currently reacting to.</span></span></label>
         </div>
       </div>
 
@@ -203,10 +194,10 @@
         <div class="items">
           <label class="check"><input type="checkbox" class="step"> <span class="c-text">Marked the <b>5m / 15m Gap</b>
             <span class="note note-continuation">CONTINUATION: This is the gap you will actually trade off of.</span>
-            <span class="note note-reversal">REVERSAL: Watching for 1H/4H structure to hold before dropping.</span>
+            <span class="note note-reversal">REVERSAL: Watching for 1H/4H structure to hold before dropping down.</span>
           </span></label>
           <label class="check"><input type="checkbox" class="step"> <span class="c-text">Confirmed <b>Manipulation</b>
-            <span class="note">Price ran into the 5m/15m gap and swept liquidity.</span>
+            <span class="note">Price ran into the 5m/15m gap and swept internal liquidity.</span>
           </span></label>
         </div>
       </div>
@@ -215,8 +206,8 @@
       <div class="panel">
         <div class="p-head"><span class="seq">S3</span><span class="p-name">Inversion (1m–5m)</span></div>
         <div class="items">
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Found the <b>Inversion</b> on the 1–5 min chart<span class="note">Prefer 1m-5m. 30-sec only if highly displaced.</span></span></label>
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">It's the <b>Highest-TF Gap</b> in that leg<span class="note">Not just any random gap on the LTF.</span></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Found the <b>Inversion</b> on the 1–5 min chart<span class="note">30-sec only if nothing shows up here — 1m preferred.</span></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">It's the <b>Highest-TF Gap</b> in that leg<span class="note">Not just any random gap on the low timeframe.</span></span></label>
         </div>
       </div>
 
@@ -224,17 +215,17 @@
       <div class="panel">
         <div class="p-head"><span class="seq">S4</span><span class="p-name">Entry Criteria & Risk</span></div>
         <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:5px; padding:10px;">
-          <div class="field-group" style="padding:0; border:none;"><label>Risk $</label><input type="number" id="riskValue"></div>
-          <div class="field-group" style="padding:0; border:none;"><label>Contracts</label><input type="number" id="contracts"></div>
+          <div class="field-group" style="padding:0; border:none;"><label>Risk $</label><input type="number" id="riskValue" placeholder="400"></div>
+          <div class="field-group" style="padding:0; border:none;"><label>Contracts</label><input type="number" id="contractSize" placeholder="1"></div>
         </div>
         <div class="items">
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Positive <b>R:R</b> ratio confirmed</span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Positive <b>R:R Ratio</b><span class="note">Targeting logic > Risk logic.</span></span></label>
           <label class="check"><input type="checkbox" class="step"> <span class="c-text">Strong <b>Pool of Liquidity</b> as target</span></label>
           <label class="check"><input type="checkbox" class="step"> <span class="c-text">Inversion within <b>3 candles or less</b></span></label>
         </div>
       </div>
 
-      <!-- THE GATE -->
+      <!-- FINAL GATE -->
       <div class="panel gate" id="gate" style="grid-column: 1 / -1;">
         <div class="scan-line"></div>
         <div class="p-head"><span class="seq" style="background:var(--amber)">GATE</span><span class="p-name">Final Go / No-Go Gate</span></div>
@@ -249,43 +240,43 @@
     </div>
   </main>
 
-  <!-- PAGE 2: JOURNAL -->
+  <!-- PAGE 2: JOURNAL MODE -->
   <main id="page-journal" class="page">
-    <div id="journal-capture">
+    <div id="journal-capture-area">
       <div class="grid">
         <div class="panel" style="grid-column: 1 / -1;">
           <div class="p-head"><span class="seq">ANL</span><span class="p-name">Analysis & Logic</span></div>
           <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
-            <div class="field-group"><label>HTF Bias & Logic</label><textarea id="j-htf" rows="4"></textarea></div>
-            <div class="field-group"><label>LTF Target & Liquidity</label><textarea id="j-ltf" rows="4"></textarea></div>
+            <div class="field-group"><label>HTF Bias Logic</label><textarea id="j-htf" rows="4" placeholder="What were we bouncing off HTF?"></textarea></div>
+            <div class="field-group"><label>LTF Target & Liquidity</label><textarea id="j-ltf" rows="4" placeholder="What key levels hit/targeted?"></textarea></div>
           </div>
-          <div class="field-group"><label>Entry Model & Time</label><input type="text" id="j-entry"></div>
+          <div class="field-group"><label>Entry Model & Exact Time</label><input type="text" id="j-entry" placeholder="e.g. 2m IFVG Entry at 15:42 SAST"></div>
         </div>
 
         <div class="panel">
           <div class="p-head"><span class="seq">PSY</span><span class="p-name">Psychology Section</span></div>
-          <div class="field-group"><label>Morning Routine / Wake Up</label><input type="text" id="j-wake"></div>
-          <div class="field-group"><label>Feelings (Pre / During / After)</label><textarea id="j-feelings" rows="5"></textarea></div>
+          <div class="field-group"><label>Morning Routine / Wake Up Time</label><input type="text" id="j-wake" placeholder="How early? Pre-market routine?"></div>
+          <div class="field-group"><label>Feelings (Pre / During / After)</label><textarea id="j-feelings" rows="5" placeholder="Internal chatter, heart rate, focus level..."></textarea></div>
         </div>
 
         <div class="panel">
           <div class="p-head"><span class="seq">IMG</span><span class="p-name">Trade Screenshot</span></div>
-          <div class="screenshot-area" onclick="document.getElementById('file-input').click()">
-            <img id="preview" src="" style="display:none;">
-            <span id="upload-hint">Tap to upload chart screenshot</span>
-            <input type="file" id="file-input" style="display:none;" onchange="previewImage(this)">
+          <div class="screenshot-placeholder" onclick="document.getElementById('file-input').click()">
+            <img id="preview-img" src="" style="display:none;">
+            <span id="upload-text">Click to upload chart screenshot</span>
+            <input type="file" id="file-input" style="display:none;" onchange="loadPreview(this)">
           </div>
         </div>
 
         <div class="panel" style="grid-column: 1 / -1;">
-          <div class="p-head"><span class="seq">REF</span><span class="p-name">Reflection</span></div>
+          <div class="p-head"><span class="seq">REF</span><span class="p-name">Performance Reflection</span></div>
           <div class="items" style="display:flex; gap:20px; border-bottom:1px solid var(--panel-2);">
             <label class="check"><input type="checkbox" id="j-rules"> <span class="c-text">Followed All Rules</span></label>
             <label class="check"><input type="checkbox" id="j-emotions"> <span class="c-text">Emotions Controlled</span></label>
           </div>
           <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
-            <div class="field-group"><label>Rules Broken</label><textarea id="j-broken" rows="3"></textarea></div>
-            <div class="field-group"><label>Improvements for Next Setup</label><textarea id="j-better" rows="3"></textarea></div>
+            <div class="field-group"><label>Rule Breaks / Mistakes</label><textarea id="j-broken" rows="3" placeholder="What rules did I break if any?"></textarea></div>
+            <div class="field-group"><label>Next Time Improvement</label><textarea id="j-better" rows="3" placeholder="What can I do better next time?"></textarea></div>
           </div>
         </div>
       </div>
@@ -293,13 +284,13 @@
   </main>
 
   <footer class="footer-actions">
-    <button class="btn btn-save" onclick="captureJournal()">Download Journal Photo</button>
-    <button class="btn btn-reset" onclick="resetAll()">Reset Session</button>
+    <button class="btn btn-save" onclick="generatePhoto()">Save Journal Photo</button>
+    <button class="btn btn-reset" onclick="resetConsole()">Reset Session</button>
   </footer>
 </div>
 
 <script>
-  // Page Switching
+  // Navigation
   function switchPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -307,37 +298,39 @@
     document.getElementById('btn-' + id).classList.add('active');
   }
 
-  // Setup Type Toggles
+  // Setup Toggle logic
   function setSetup(type) {
     document.body.setAttribute('data-setup', type);
-    document.querySelectorAll('.s-btn').forEach(b => {
-      b.classList.toggle('active', b.innerText.toLowerCase() === type);
-    });
+    document.getElementById('btn-cont').classList.toggle('active', type === 'continuation');
+    document.getElementById('btn-rev').classList.toggle('active', type === 'reversal');
   }
 
-  // Execution Logic
+  // Master Checklist Logic
   const steps = document.querySelectorAll('.step');
   const gateSteps = document.querySelectorAll('.gate-step');
   const master = document.getElementById('master');
   const mstatus = document.getElementById('mstatus');
+  const mmsg = document.getElementById('mmsg');
   const alertBox = document.getElementById('exec-alert');
   const gate = document.getElementById('gate');
 
-  function updateLogic() {
-    const sDone = Array.from(steps).filter(s => s.checked).length;
-    const gDone = Array.from(gateSteps).filter(s => s.checked).length;
-
-    if (sDone === steps.length) {
+  function updateMaster() {
+    const sCount = Array.from(steps).filter(s => s.checked).length;
+    const gCount = Array.from(gateSteps).filter(s => s.checked).length;
+    
+    if (sCount === steps.length) {
       gate.classList.add('armed');
       gateSteps.forEach(gs => gs.disabled = false);
       mstatus.innerText = "STANDBY";
+      mmsg.innerText = "Gate armed. Complete final Go/No-Go.";
     } else {
       gate.classList.remove('armed');
       gateSteps.forEach(gs => { gs.disabled = true; gs.checked = false; });
       mstatus.innerText = "NO-GO";
+      mmsg.innerText = "Work through S1–S4 to arm the gate.";
     }
 
-    if (sDone === steps.length && gDone === gateSteps.length) {
+    if (sCount === steps.length && gCount === gateSteps.length) {
       mstatus.innerText = "GO";
       mstatus.style.color = "var(--green)";
       alertBox.style.display = "block";
@@ -347,84 +340,74 @@
     }
   }
 
-  [...steps, ...gateSteps].forEach(s => s.addEventListener('change', updateLogic));
+  [...steps, ...gateSteps].forEach(s => s.addEventListener('change', updateMaster));
 
-  // Time & Session Logic
-  function updateClock() {
+  // NY Session Logic (9:30 - 11:00 AM NY)
+  function clockTick() {
     const now = new Date();
     document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
 
-    // NY Time Logic
-    const nyTime = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
-    const nyHours = nyTime.getHours();
-    const nyMins = nyTime.getMinutes();
-    const totalNyMins = (nyHours * 60) + nyMins;
+    // NY Calc
+    const nyStr = now.toLocaleString("en-US", {timeZone: "America/New_York"});
+    const nyTime = new Date(nyStr);
+    const nyMins = (nyTime.getHours() * 60) + nyTime.getMinutes();
 
-    const startMins = (9 * 60) + 30; // 9:30 AM
-    const endMins = 11 * 60;        // 11:00 AM
+    const start = (9 * 60) + 30; // 9:30 AM
+    const end = 11 * 60;        // 11:00 AM
 
-    const isInWindow = totalNyMins >= startMins && totalNyMins <= endMins;
+    const isIn = nyMins >= start && nyMins <= end;
     const tag = document.getElementById('session-status');
-    
-    if (isInWindow) {
-      tag.innerText = "IN WINDOW (NY AM)";
-      tag.className = "session-tag tag-in";
-    } else {
-      tag.innerText = "OUTSIDE WINDOW";
-      tag.className = "session-tag tag-out";
-    }
+    tag.innerText = isIn ? "IN WINDOW (NY AM)" : "OUTSIDE WINDOW";
+    tag.className = isIn ? "session-tag tag-in" : "session-tag tag-out";
 
-    // Show Local Range (e.g. SAST)
-    // Calculating what 9:30 NY is in local time
-    const diff = (now.getTime() - nyTime.getTime());
-    const localStart = new Date(nyTime.setHours(9,30,0,0) + diff);
-    const localEnd = new Date(nyTime.setHours(11,0,0,0) + diff);
+    // Show Local Time Equivalent
+    const offset = now.getTime() - nyTime.getTime();
+    const localStart = new Date(nyTime.setHours(9, 30, 0, 0) + offset);
+    const localEnd = new Date(nyTime.setHours(11, 0, 0, 0) + offset);
     
-    const timeOpts = { hour: '2-digit', minute: '2-digit', hour12: true };
+    const timeFmt = { hour: '2-digit', minute: '2-digit', hour12: true };
     document.getElementById('local-range').innerText = 
-      `LOCAL: ${localStart.toLocaleTimeString([], timeOpts)} - ${localEnd.toLocaleTimeString([], timeOpts)}`;
+      `LOCAL: ${localStart.toLocaleTimeString([], timeFmt)} - ${localEnd.toLocaleTimeString([], timeFmt)}`;
   }
+  setInterval(clockTick, 1000);
+  clockTick();
 
-  setInterval(updateClock, 1000);
-  updateClock();
-
-  // Image Upload
-  function previewImage(input) {
+  // Screenshot Preview
+  function loadPreview(input) {
     const file = input.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = e => {
-        const img = document.getElementById('preview');
+        const img = document.getElementById('preview-img');
         img.src = e.target.result;
         img.style.display = 'block';
-        document.getElementById('upload-hint').style.display = 'none';
+        document.getElementById('upload-text').style.display = 'none';
       };
       reader.readAsDataURL(file);
     }
   }
 
-  // PHOTO CAPTURE LOGIC
-  function captureJournal() {
-    const captureArea = document.getElementById('journal-capture');
-    switchPage('journal'); // Ensure user is on journal page for capture
+  // SAVE AS PHOTO ENGINE
+  function generatePhoto() {
+    const area = document.getElementById('journal-capture-area');
+    switchPage('journal'); // Force journal page view for capture
     
-    html2canvas(captureArea, {
+    html2canvas(area, {
       backgroundColor: "#D1D4DC",
-      scale: 2, // Higher quality
+      scale: 2,
       logging: false,
       useCORS: true
     }).then(canvas => {
       const link = document.createElement('a');
-      link.download = `FeX_TradeLog_${Date.now()}.png`;
+      link.download = `FeX_Journal_${Date.now()}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     });
   }
 
-  function resetAll() {
-    if(confirm("Wipe all data and reset?")) window.location.reload();
+  function resetConsole() {
+    if(confirm("Confirm: Wipe all data for new session?")) window.location.reload();
   }
 </script>
-
 </body>
 </html>
