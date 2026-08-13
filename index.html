@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>FeXecutioner | Trading OS v5.0</title>
+<title>FeXecutioner | Trading OS v22.0</title>
 
 <!-- External Resources -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,475 +13,712 @@
 
 <style>
   :root {
-    --bg: #D1D4DC; /* Chart Background */
-    --panel: #FFFFFF; /* Upclose Candles */
-    --panel-2: #e9ebf0;
-    --line: #787B86; /* Downclose Candles */
-    --ink: #050505;
-    --ink-dim: #34363b;
-    --ink-faint: #686b72;
+    --bg: #D1D4DC;        /* Institutional Canvas */
+    --ink: #050505;       /* Pure Black */
+    --panel: #FFFFFF;     /* Upclose White */
+    --panel-alt: #e9ebf0;
+    --line: #787B86;      /* Downclose Slate */
+    --turquoise: #00CED1; /* Continuation Highlight */
+    --turquoise-glow: rgba(0, 206, 209, 0.4);
+    --red: #FF4D4D;
     --green: #27D38C;
     --amber: #E9A23B;
-    --red: #E8554E;
     --mono: 'JetBrains Mono', monospace;
     --disp: 'Chakra Petch', sans-serif;
     --body: 'Inter', sans-serif;
   }
 
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; outline: none; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--ink); }
+  ::-webkit-scrollbar-thumb { background: var(--turquoise); border-radius: 10px; }
+
   body {
     background: var(--bg);
     color: var(--ink);
     font-family: var(--body);
     margin: 0;
-    padding: 20px 15px 100px;
+    padding: 0;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
-  .wrap { max-width: 1000px; margin: 0 auto; position: relative; }
-
-  /* Navigation */
-  .mode-nav { display: flex; gap: 2px; background: var(--line); padding: 2px; border-radius: 4px; margin-bottom: 20px; }
-  .nav-btn { flex: 1; background: var(--bg); border: none; padding: 14px; font-family: var(--mono); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
-  .nav-btn.active { background: var(--ink); color: var(--panel); }
-
-  /* Telemetry Clock Header */
-  .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 20px; }
-  .brand h1 { font-family: var(--disp); font-size: 32px; margin: 0; text-transform: uppercase; line-height: 1; }
-  .telemetry { text-align: right; font-family: var(--mono); }
-  .clock { font-size: 36px; font-weight: 700; line-height: 1; letter-spacing: 1px; }
+  /* --- APP SHELL --- */
+  .app-container { display: flex; min-height: 100vh; }
   
-  .session-tag { font-size: 13px; text-transform: uppercase; font-weight: 800; margin-top: 10px; padding: 8px 16px; border-radius: 2px; display: inline-block; letter-spacing: 1px; transition: 0.3s; }
-  .tag-out { background: var(--line); color: #FFFFFF; }
-  .tag-in { background: #FFFFFF; color: var(--ink); border: 1px solid var(--ink); box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+  .sidebar {
+    width: 280px;
+    background: var(--ink);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 0;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+    border-right: 1px solid var(--line);
+  }
 
-  #local-range { font-size: 12px; font-weight: 700; margin-top: 8px; font-family: var(--mono); }
-  .range-out { color: var(--line); }
-  .range-in { color: var(--ink); border-bottom: 2px solid var(--ink); }
+  .side-header { padding: 0 30px; margin-bottom: 50px; }
+  .side-header h1 { font-family: var(--disp); font-size: 24px; margin: 0; letter-spacing: 2px; }
+  .side-header span { font-family: var(--mono); font-size: 10px; color: var(--line); text-transform: uppercase; }
 
-  /* Master Console Display */
-  .master { position: relative; border: 1px solid var(--ink); background: var(--panel); padding: 24px; border-radius: 4px; margin-bottom: 20px; box-shadow: 6px 6px 0 var(--line); }
-  .m-status { font-family: var(--disp); font-size: 56px; font-weight: 700; line-height: 1; }
-  #mmsg { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 5px; }
+  .nav-menu { flex-grow: 1; }
+  .nav-item {
+    padding: 18px 30px;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--line);
+    cursor: pointer;
+    transition: 0.3s;
+    border-left: 4px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav-item:hover, .nav-item.active { background: #111; color: var(--turquoise); border-left-color: var(--turquoise); }
 
-  /* Layout Grid */
+  .main-viewport {
+    flex-grow: 1;
+    margin-left: 280px;
+    padding: 40px;
+    position: relative;
+  }
+
+  /* --- TELEMETRY --- */
+  .telemetry {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+  }
+  .clock { font-size: 42px; font-weight: 700; font-family: var(--mono); line-height: 1; }
+  .session-pill {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .pill-out { background: var(--line); color: white; }
+  .pill-in { background: var(--panel); color: var(--ink); border: 1px solid var(--ink); box-shadow: 0 0 15px white; }
+
+  /* --- MASTER STATUS --- */
+  .master-status {
+    background: var(--panel);
+    border: 1px solid var(--ink);
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 8px 8px 0 var(--line);
+    position: relative;
+  }
+  .m-title { font-family: var(--disp); font-size: 64px; font-weight: 800; line-height: 1; }
+  .m-msg { font-family: var(--mono); font-size: 13px; color: var(--ink-dim); margin-top: 10px; }
+
+  /* --- GRID SYSTEM --- */
   .page { display: none; }
   .page.active { display: block; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  .panel { border: 1px solid var(--line); background: var(--panel); border-radius: 4px; overflow: hidden; margin-bottom: 5px; }
-  .p-head { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); }
-  .seq { background: var(--ink); color: var(--panel); font-family: var(--mono); font-size: 10px; padding: 2px 6px; border-radius: 2px; }
-  .p-name { font-family: var(--disp); font-weight: 700; font-size: 14px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-  /* Continuation / Reversal Toggle */
-  .setup-toggle { display: flex; gap: 5px; padding: 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); }
-  .s-btn { flex: 1; padding: 8px; font-family: var(--mono); font-size: 10px; font-weight: 700; border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; background: var(--panel); }
-  .s-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    height: fit-content;
+  }
+  .p-head {
+    background: var(--panel-alt);
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--disp);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 14px;
+  }
+  .seq { background: var(--ink); color: white; padding: 2px 8px; border-radius: 2px; font-family: var(--mono); font-size: 10px; }
 
-  /* Checkbox Items */
-  .check { display: flex; gap: 12px; padding: 14px 12px; cursor: pointer; align-items: flex-start; transition: 0.1s; }
-  .check:hover { background: var(--panel-2); }
-  .check input { width: 20px; height: 20px; accent-color: var(--ink); margin-top: 2px; cursor: pointer; }
+  .check {
+    display: flex;
+    gap: 15px;
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--panel-alt);
+    transition: 0.2s;
+    align-items: flex-start;
+  }
+  .check:hover { background: var(--panel-alt); }
+  .check input { width: 22px; height: 22px; accent-color: var(--ink); margin-top: 2px; }
   .c-text { font-size: 14px; line-height: 1.4; font-weight: 500; }
-  .note { display: block; font-size: 11px; color: var(--ink-faint); font-family: var(--mono); margin-top: 5px; }
+  .note { display: block; font-size: 11px; color: var(--line); font-family: var(--mono); margin-top: 4px; }
+
+  /* --- FORMS --- */
+  .field-group { padding: 20px; border-bottom: 1px solid var(--panel-alt); }
+  label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; color: var(--line); }
+  textarea, input[type="text"], input[type="number"] {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: var(--panel-alt);
+    padding: 15px;
+    font-family: var(--body);
+    font-size: 14px;
+    border-radius: 2px;
+    color: var(--ink);
+  }
+  textarea:focus, input:focus { background: #fff; border-color: var(--ink); }
+
+  /* --- EXECUTION STATE --- */
+  #bottom-flow { display: none; margin-top: 40px; border-top: 4px solid var(--ink); padding-top: 40px; }
   
-  .note-continuation { color: var(--green); display: none; }
-  .note-reversal { color: var(--amber); display: none; }
-  body[data-setup="continuation"] .note-continuation { display: block; }
-  body[data-setup="reversal"] .note-reversal { display: block; }
+  .exec-alert {
+    background: var(--ink);
+    color: white;
+    padding: 25px;
+    text-align: center;
+    font-family: var(--mono);
+    font-weight: 700;
+    letter-spacing: 4px;
+    font-size: 18px;
+    margin-bottom: 30px;
+    animation: blink 1.2s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.3; } }
 
-  /* Risk & Calculation UI */
-  .buffer-row { background: var(--panel-2); padding: 15px; font-family: var(--mono); font-size: 11px; line-height: 1.6; border-bottom: 1px solid var(--line); }
-  .buffer-row b { color: var(--red); font-weight: 700; }
+  .pnl-output { padding: 30px; text-align: center; font-family: var(--disp); font-size: 42px; font-weight: 800; border: 2px solid var(--line); margin-top: 20px; }
+  .gain { background: #fff; color: var(--green); border-color: var(--green); }
+  .loss { background: var(--line); color: #fff; border-color: var(--ink); }
 
-  /* The Gate & Scan Line */
-  .gate { position: relative; border: 2px solid var(--line); transition: 0.5s; }
-  .gate.armed { border-color: var(--green); box-shadow: 0 0 20px rgba(39, 211, 140, 0.2); }
-  .scan-line { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(39, 211, 140, 0.15), transparent); pointer-events: none; }
-  .gate.armed .scan-line { animation: scan 2s linear infinite; }
+  .screenshot-zone {
+    border: 2px dashed var(--line);
+    background: var(--panel-alt);
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin: 15px;
+    position: relative;
+    overflow: hidden;
+  }
+  .screenshot-zone img { width: 100%; height: 100%; object-fit: contain; position: absolute; }
+
+  /* --- GATE SCANNING --- */
+  .gate { position: relative; border: 2px solid var(--line); }
+  .gate.armed { border-color: var(--turquoise); box-shadow: 0 0 25px var(--turquoise-glow); }
+  .scan-line {
+    position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 206, 209, 0.1), transparent);
+    pointer-events: none;
+  }
+  .gate.armed .scan-line { animation: scan 3s linear infinite; }
   @keyframes scan { from { left: -100%; } to { left: 100%; } }
 
-  /* BOTTOM EXECUTION FLOW (DYNAMIC) */
-  #bottom-flow { display: none; margin-top: 40px; border-top: 4px solid var(--ink); padding-top: 40px; }
-  #exec-alert { background: var(--ink); color: var(--panel); padding: 18px; text-align: center; font-family: var(--mono); font-weight: 700; margin-bottom: 25px; animation: blink 1.2s infinite; letter-spacing: 4px; font-size: 14px; border-radius: 4px; }
-  @keyframes blink { 50% { opacity: 0.4; } }
-  #journal-capture-zone { padding: 25px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
-
-  /* Financial PnL Panel */
-  .pnl-output { padding: 20px; text-align: center; font-family: var(--disp); font-size: 32px; font-weight: 700; border-radius: 4px; margin-top: 10px; transition: 0.3s; border: 1px solid var(--line); }
-  .pnl-gain { background: var(--panel); color: var(--green); border-color: var(--green); box-shadow: 0 0 15px rgba(39, 211, 140, 0.2); }
-  .pnl-loss { background: var(--line); color: var(--panel); border-color: var(--ink); }
-
-  /* Input Group */
-  .field-group { padding: 12px; border-bottom: 1px solid var(--panel-2); }
-  label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
-  textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid var(--line); background: var(--panel-2); padding: 12px; font-family: var(--body); font-size: 13px; border-radius: 2px; color: var(--ink); }
-
-  .screenshot-zone { border: 2px dashed var(--line); background: var(--panel-2); min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; margin: 15px; border-radius: 4px; overflow: hidden; }
-  .screenshot-zone img { max-width: 100%; height: auto; display: block; }
-
-  /* Internal Database Styling */
-  .history-item { margin-bottom: 30px; border: 1px solid var(--line); background: var(--panel); border-radius: 4px; overflow: hidden; box-shadow: 6px 6px 0 var(--line); }
-  .history-meta { padding: 12px 15px; background: var(--ink); color: white; font-family: var(--mono); font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
-  .history-thumb { width: 100%; max-height: 400px; overflow-y: auto; cursor: zoom-in; }
-  .history-thumb img { width: 100%; height: auto; display: block; }
-
-  /* Lightbox */
-  #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; padding: 40px; overflow-y: auto; text-align: center; }
-  #lightbox img { max-width: 100%; height: auto; border: 2px solid white; }
-  .close-lightbox { position: fixed; top: 20px; right: 20px; color: white; font-family: var(--mono); font-size: 14px; cursor: pointer; background: var(--red); padding: 10px 20px; border-radius: 4px; z-index: 10001; }
-
-  /* Actions */
-  .footer-actions { display: flex; gap: 10px; margin-top: 40px; }
-  .btn { flex: 1; padding: 20px; font-family: var(--mono); font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; border: 1px solid var(--ink); font-size: 11px; transition: 0.2s; }
-  .btn-commit { background: var(--green); color: var(--ink); border-color: var(--ink); }
-  .btn-save { background: var(--ink); color: var(--panel); border: none; }
-  .btn-reset { background: transparent; color: var(--ink-faint); border-color: var(--line); }
+  /* --- INTERNAL GALLERY --- */
+  .gallery { display: grid; gap: 30px; }
+  .history-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 10px 10px 0 var(--line);
+  }
+  .h-meta {
+    padding: 15px 20px;
+    background: var(--ink);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    align-items: center;
+  }
+  .h-preview { width: 100%; max-height: 400px; object-fit: cover; cursor: zoom-in; border-top: 1px solid #333; }
   
-  #status-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; color: white; flex-direction: column; align-items: center; justify-content: center; font-family: var(--mono); }
+  .report-btn {
+    background: var(--turquoise);
+    color: var(--ink);
+    border: none;
+    padding: 8px 16px;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  /* --- OVERLAYS --- */
+  #status-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 10000;
+    color: white;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    letter-spacing: 2px;
+  }
+
+  #lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.98);
+    z-index: 10001;
+    padding: 40px;
+    overflow-y: auto;
+  }
+  .lb-content { max-width: 1000px; margin: 0 auto; text-align: center; }
+  .lb-img { max-width: 100%; border: 3px solid #fff; margin-bottom: 30px; }
+  
+  .dossier {
+    background: var(--bg);
+    color: var(--ink);
+    padding: 40px;
+    text-align: left;
+    font-family: var(--body);
+    border-radius: 4px;
+    margin-top: 20px;
+  }
+  .dossier h2 { font-family: var(--disp); border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
+  .d-section { margin-bottom: 25px; }
+  .d-label { font-family: var(--mono); font-weight: 800; font-size: 11px; color: var(--line); text-transform: uppercase; }
+  .d-value { font-size: 16px; margin-top: 5px; white-space: pre-wrap; line-height: 1.6; }
+
+  .close-btn {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    background: var(--red);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-family: var(--mono);
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 10002;
+  }
+
+  .btn-row { display: flex; gap: 15px; margin-top: 40px; }
+  .btn {
+    flex: 1;
+    padding: 20px;
+    font-family: var(--mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: 0.2s;
+  }
+  .btn-commit { background: var(--green); color: var(--ink); border: none; }
+  .btn-save { background: var(--ink); color: white; border: none; }
+  .btn-reset { background: transparent; border: 1px solid var(--line); color: var(--line); }
+  .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+  /* --- MOBILE FIXES --- */
+  @media (max-width: 1000px) {
+    .sidebar { width: 80px; padding: 20px 0; }
+    .side-header, .nav-text, .sidebar-footer { display: none; }
+    .nav-item { justify-content: center; padding: 25px 0; }
+    .main-viewport { margin-left: 80px; padding: 20px; }
+    .grid { grid-template-columns: 1fr; }
+    .m-title { font-size: 40px; }
+  }
+
 </style>
 </head>
-<body data-setup="continuation">
+<body>
 
-<!-- Overlay UI -->
-<div id="status-overlay">
-  <div style="font-size: 20px; margin-bottom: 10px; letter-spacing: 2px;">SYNCING VISUAL DATABASE...</div>
-  <div style="font-size: 12px; color: var(--green);">Generating high-res trade record.</div>
-</div>
+  <div class="scanline"></div>
 
-<div id="lightbox" onclick="this.style.display='none'">
-  <span class="close-lightbox">CLOSE FILE [X]</span>
-  <img id="lightbox-img" src="">
-</div>
+  <!-- STATUS OVERLAY -->
+  <div id="status-overlay">
+    <div style="font-size: 28px; margin-bottom: 10px;">DEEP ARCHIVING IN PROGRESS</div>
+    <div id="status-msg">EXPANDING DATA NODES...</div>
+  </div>
 
-<div class="wrap">
-  <nav class="mode-nav">
-    <button class="nav-btn active" id="btn-exec" onclick="switchPage('exec')">Execution Mode</button>
-    <button class="nav-btn" id="btn-journal" onclick="switchPage('journal')">Internal Journal</button>
-  </nav>
-
-  <header class="head">
-    <div class="brand">
-      <div style="font-family:var(--mono); font-size:10px; letter-spacing:4px; color:var(--ink-faint);">FEXECUTIONER</div>
-      <h1>CONSOLE</h1>
+  <!-- LIGHTBOX / REPORT VIEW -->
+  <div id="lightbox">
+    <button class="close-btn" onclick="closeReport()">TERMINAL CLOSE [X]</button>
+    <div class="lb-content">
+      <img id="lb-img" class="lb-img">
+      <div id="lb-dossier" class="dossier"></div>
     </div>
-    <div class="telemetry">
-      <div class="clock" id="clock">00:00:00</div>
-      <div id="session-status" class="session-tag tag-out">Checking Window...</div>
-      <div id="local-range" class="range-out">LOCAL: --:--</div>
-    </div>
-  </header>
+  </div>
 
-  <section class="master" id="master">
-    <div class="m-status" id="mstatus">NO-GO</div>
-    <div id="mmsg">Complete sections S1 through S4 to arm the execution gate.</div>
-  </section>
-
-  <!-- PAGE 1: EXECUTION -->
-  <main id="page-exec" class="page active">
-    <div class="grid">
-      <!-- S1 -->
-      <div class="panel">
-        <div class="p-head"><span class="seq">S1</span><span class="p-name">Bias & HTF Gap</span></div>
-        <div class="setup-toggle">
-          <button class="s-btn active" id="btn-cont" onclick="setSetup('continuation')">Continuation</button>
-          <button class="s-btn" id="btn-rev" onclick="setSetup('reversal')">Reversal</button>
-        </div>
-        <div class="field-group">
-          <label>Directional Bias</label>
-          <input type="text" id="biasInput" placeholder="HTF Bias and reasoning...">
-        </div>
-        <div class="items">
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Checked <b>Premarket price action</b><span class="note">Reviewed overnight highs/lows and premarket VWAP levels.</span></span></label>
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Found the most recent <b>1H / 4H FVG</b><span class="note">The higher timeframe fair value gap price is currently reacting to.</span></span></label>
-        </div>
+  <div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="side-header">
+        <h1>FEXECUTIONER</h1>
+        <span>Deployment Hub v22.0</span>
       </div>
-
-      <!-- S2 -->
-      <div class="panel">
-        <div class="p-head"><span class="seq">S2</span><span class="p-name">Scale to 5m / 15m</span></div>
-        <div class="items">
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Marked the <b>5m / 15m Gap</b>
-            <span class="note note-continuation">CONTINUATION: This is the specific gap you will actually trade off of.</span>
-            <span class="note note-reversal">REVERSAL: Watching for 1H/4H structure to hold before dropping down.</span>
-          </span></label>
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Confirmed <b>Manipulation</b><span class="note">Price ran into the 5m/15m gap and swept internal/session liquidity.</span></span></label>
+      <nav class="nav-menu">
+        <div class="nav-item active" onclick="switchPage('exec', this)">
+          <span class="nav-text">Operational Dash</span>
         </div>
+        <div class="nav-item" onclick="switchPage('journal', this)">
+          <span class="nav-text">Internal Database</span>
+        </div>
+      </nav>
+      <div style="padding: 30px; font-family: var(--mono); font-size: 9px; color: var(--line);">
+        SYS_STATUS: ONLINE<br>
+        LOC: CAPE_TOWN.ZA
       </div>
+    </aside>
 
-      <!-- S3 -->
-      <div class="panel">
-        <div class="p-head"><span class="seq">S3</span><span class="p-name">Inversion (1m–5m)</span></div>
-        <div class="items">
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Found the <b>Inversion</b> on the 1–5 min chart<span class="note">30-sec only if nothing shows up here — 1m is preferred.</span></span></label>
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">It's the <b>Highest-TF Gap</b> in that leg<span class="note">Must be the primary gap made during that specific manipulation leg.</span></span></label>
-        </div>
-      </div>
+    <!-- MAIN VIEWPORT -->
+    <main class="main-viewport">
+      
+      <!-- OPERATIONAL DASHBOARD -->
+      <section id="page-exec" class="page active">
+        <header class="telemetry">
+          <div class="brand">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 4px; color: var(--line);">FE-XECUTIONER</div>
+            <div class="clock" id="clock">00:00:00</div>
+          </div>
+          <div style="text-align: right;">
+            <div id="session-tag" class="session-pill pill-out">Checking Window...</div>
+            <div id="local-range" style="font-family: var(--mono); font-size: 11px; margin-top: 8px;">LOCAL: Calculating...</div>
+          </div>
+        </header>
 
-      <!-- S4 -->
-      <div class="panel">
-        <div class="p-head"><span class="seq">S4</span><span class="p-name">Risk & Buffer</span></div>
-        <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
-          <div class="field-group"><label>Account Size $</label><input type="number" id="acctSize" placeholder="50000"></div>
-          <div class="field-group"><label>Total Drawdown $</label><input type="number" id="maxDD" placeholder="2000" oninput="calcBuffer()"></div>
+        <div class="master-status">
+          <div class="m-title" id="mstatus">NO-GO</div>
+          <div class="m-msg" id="mmsg">Complete Deployment Stages S1-S4 to arm the gate.</div>
         </div>
-        <div class="field-group"><label>Risk Per Trade $</label><input type="number" id="riskPerTrade" placeholder="400" oninput="calcBuffer()"></div>
-        <div class="buffer-row" id="bufferDisplay">Enter data to calculate buffer.</div>
-        <div class="items">
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Positive <b>R:R Ratio</b> confirmed</span></label>
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Targeting <b>Clear Liquidity</b> pool</span></label>
-          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Inversion within <b>3 candles or less</b></span></label>
-        </div>
-      </div>
 
-      <!-- THE GATE -->
-      <div class="panel gate" id="gate" style="grid-column: 1 / -1;">
-        <div class="scan-line"></div>
-        <div class="p-head"><span class="seq" style="background:var(--amber)">GATE</span><span class="p-name">Final Go / No-Go Gate</span></div>
-        <div class="items" id="gateItems">
-          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">Inside my <b>Session Window</b>?</span></label>
-          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">Setup confirmed from <b>HTF Gap</b>?</span></label>
-          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">5m/15m gap <b>manipulated + swept</b>?</span></label>
-          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text"><b>Inversion confirmed</b> off highest-TF gap?</span></label>
-          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">This is the trade I <b>planned for</b>?</span></label>
-        </div>
-      </div>
-    </div>
-
-    <!-- BOTTOM EXECUTION FLOW -->
-    <div id="bottom-flow">
-      <div id="exec-alert">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
-      <div id="journal-capture-zone">
         <div class="grid">
-          <!-- Financials -->
-          <div class="panel" style="grid-column: 1 / -1;">
-            <div class="p-head"><span class="seq">FIN</span><span class="p-name">Daily Financials</span></div>
-            <div class="grid" style="grid-template-columns: repeat(3, 1fr); border:none; gap:0;">
-              <div class="field-group"><label>Balance Before</label><input type="number" id="balBefore" oninput="calcPnL()"></div>
-              <div class="field-group"><label>Balance After</label><input type="number" id="balAfter" oninput="calcPnL()"></div>
-              <div class="field-group"><label>PnL Amount</label><input type="number" id="manualPnL" placeholder="Auto-calculated"></div>
-            </div>
-            <div id="pnlResult" class="pnl-output">NET RESULT: $0.00</div>
-          </div>
-
-          <div class="panel" style="grid-column: 1 / -1;">
-            <div class="p-head"><span class="seq">ANL</span><span class="p-name">Post-Trade Analysis</span></div>
-            <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
-              <div class="field-group"><label>HTF Bias Logic</label><textarea id="j-htf" rows="4"></textarea></div>
-              <div class="field-group"><label>LTF Target & Liquidity</label><textarea id="j-ltf" rows="4"></textarea></div>
-            </div>
-            <div class="field-group"><label>Entry Model & Exact Time</label><input type="text" id="j-entry"></div>
-          </div>
-
+          <!-- S1 -->
           <div class="panel">
-            <div class="p-head"><span class="seq">PSY</span><span class="p-name">Psychology Review</span></div>
-            <div class="field-group"><label>Morning Routine / Wake Up</label><input type="text" id="j-wake"></div>
-            <div class="field-group"><label>Feelings (Pre / During / After)</label><textarea id="j-feelings" rows="5"></textarea></div>
+            <div class="p-head"><span class="seq">S1</span> Bias & HTF Context</div>
+            <div class="setup-toggle">
+              <div class="field-group">
+                <label>Institutional Bias</label>
+                <input type="text" id="biasInput" placeholder="HTF draw and technical reasoning...">
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Checked <b>Premarket PA</b><span class="note">Reviewed overnight highs/lows and VWAP.</span></div></label>
+            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Found most recent <b>1H / 4H FVG</b><span class="note">The anchor price is reacting to.</span></div></label>
           </div>
 
+          <!-- S2 -->
           <div class="panel">
-            <div class="p-head"><span class="seq">IMG</span><span class="p-name">Chart Snapshot</span></div>
-            <div class="screenshot-zone" onclick="document.getElementById('file-input').click()">
-              <img id="preview-img" src="" style="display:none;">
-              <span id="upload-hint">Upload chart screenshot</span>
-              <input type="file" id="file-input" style="display:none;" onchange="handlePreview(this)">
-            </div>
+            <div class="p-head"><span class="seq">S2</span> Scale to 5m / 15m</div>
+            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Marked the <b>5m / 15m Gap</b><span class="note">The specific gap for the actual trade.</span></div></label>
+            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Confirmed <b>Manipulation</b><span class="note">Price sweep of liquidity into the gap.</span></div></label>
           </div>
 
-          <div class="panel" style="grid-column: 1 / -1;">
-            <div class="p-head"><span class="seq">REF</span><span class="p-name">Reflection</span></div>
-            <div class="items" style="display:flex; gap:20px; border-bottom:1px solid var(--panel-2);">
-              <label class="check"><input type="checkbox" id="j-rules"> <span class="c-text">Followed Rules</span></label>
-              <label class="check"><input type="checkbox" id="j-emotions"> <span class="c-text">Emotions Controlled</span></label>
+          <!-- S3 -->
+          <div class="panel">
+            <div class="p-head"><span class="seq">S3</span> Inversion (1m–5m)</div>
+            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Found <b>Inversion</b> on 1-5 min chart<span class="note">1m preferred. 30s only if extreme displacement.</span></div></label>
+            <label class="check"><input type="checkbox" class="step"> <div class="c-text">It's the <b>Highest-TF Gap</b><span class="note">Primary gap made in the manipulation leg.</span></div></label>
+          </div>
+
+          <!-- S4 -->
+          <div class="panel">
+            <div class="p-head"><span class="seq">S4</span> Risk & Survivability</div>
+            <div class="grid" style="grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--panel-alt);">
+              <div class="field-group" style="border-right: 1px solid var(--panel-alt);"><label>Max Drawdown $</label><input type="number" id="maxDD" oninput="calcBuffer()"></div>
+              <div class="field-group"><label>Risk per Trade $</label><input type="number" id="riskAmt" oninput="calcBuffer()"></div>
             </div>
-            <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
-              <div class="field-group"><label>Rule Breaks</label><textarea id="j-broken" rows="3"></textarea></div>
-              <div class="field-group"><label>Improvements</label><textarea id="j-better" rows="3"></textarea></div>
-            </div>
+            <div id="bufferDisplay" style="padding: 15px; font-family: var(--mono); font-size: 11px; background: var(--panel-alt);">Survival math pending...</div>
+            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Positive <b>R:R Ratio</b> confirmed</div></label>
+            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Targeting <b>Clear Liquidity</b></div></label>
+            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Inversion <b>≤ 3 candles</b></div></label>
+          </div>
+
+          <!-- THE GATE -->
+          <div class="panel gate" id="gate" style="grid-column: 1 / -1;">
+            <div class="scan-line"></div>
+            <div class="p-head"><span class="seq" style="background: var(--amber);">GATE</span> Final Go / No-Go Validation</div>
+            <label class="check"><input type="checkbox" class="gate-step" disabled> <div class="os-c-text">Inside <b>Session Window</b> (9:30–11:00 NY)?</div></label>
+            <label class="check"><input type="checkbox" class="gate-step" disabled> <div class="os-c-text">Inversion confirmed off <b>Highest-TF Gap</b>?</div></label>
+            <label class="check"><input type="checkbox" class="gate-step" disabled> <div class="os-c-text">This is the <b>Trade I Planned</b> (Not a chase)?</div></label>
           </div>
         </div>
-      </div>
-      <footer class="footer-actions">
-        <button class="btn btn-commit" onclick="commitInternalVisual()">Commit to Internal Journal</button>
-        <button class="btn btn-save" onclick="downloadManualPNG()">Download Journal Photo</button>
-        <button class="btn btn-reset" onclick="resetSession()">Reset Console</button>
-      </footer>
-    </div>
-  </main>
 
-  <!-- PAGE 2: JOURNAL -->
-  <main id="page-journal" class="page">
-    <div id="internal-gallery">
-      <!-- Records load here -->
-    </div>
-  </main>
-</div>
+        <!-- DYNAMIC BOTTOM FLOW -->
+        <div id="bottom-flow">
+          <div class="exec-alert">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
+          
+          <div id="journal-capture-zone">
+            <div class="grid">
+              <!-- Financials -->
+              <div class="panel" style="grid-column: 1 / -1;">
+                <div class="p-head"><span class="seq">FIN</span> Daily Performance</div>
+                <div style="display: flex; gap: 20px; padding: 20px;">
+                  <div style="flex: 1;"><label>Balance Before</label><input type="number" id="balBefore" oninput="calcPnL()"></div>
+                  <div style="flex: 1;"><label>Balance After</label><input type="number" id="balAfter" oninput="calcPnL()"></div>
+                </div>
+                <div id="pnlResult" class="pnl-output">RESULT: $0.00</div>
+              </div>
 
-<script>
-  // --- DB SETUP ---
-  let db;
-  const dbReq = indexedDB.open("FExecDBv2", 1);
-  dbReq.onupgradeneeded = e => {
-    db = e.target.result;
-    if (!db.objectStoreNames.contains("trades")) db.createObjectStore("trades", { keyPath: "id" });
-  };
-  dbReq.onsuccess = e => db = e.target.result;
+              <!-- Technical & Psych -->
+              <div class="panel">
+                <div class="p-head">Technical Narrative</div>
+                <textarea id="j-logic" rows="8" placeholder="HTF logic, LTF keys, and targets..."></textarea>
+              </div>
+              <div class="panel">
+                <div class="p-head">Psychological State</div>
+                <textarea id="j-psy" rows="8" placeholder="Routine, feelings pre/during/after, and discipline..."></textarea>
+              </div>
 
-  function switchPage(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + id).classList.add('active');
-    document.getElementById('btn-' + id).classList.add('active');
-    if(id === 'journal') loadInternalGallery();
-  }
+              <!-- Snapshot -->
+              <div class="panel" style="grid-column: 1 / -1;">
+                <div class="p-head">Visual Archive</div>
+                <div class="screenshot-zone" onclick="document.getElementById('file-input').click()">
+                  <img id="preview-img">
+                  <span id="upload-hint">CLICK TO UPLOAD CHART SNAPSHOT</span>
+                  <input type="file" id="file-input" style="display: none;" onchange="handlePreview(this)">
+                </div>
+              </div>
+            </div>
+          </div>
 
-  function setSetup(type) {
-    document.body.setAttribute('data-setup', type);
-    document.getElementById('btn-cont').classList.toggle('active', type === 'continuation');
-    document.getElementById('btn-rev').classList.toggle('active', type === 'reversal');
-  }
-
-  // --- LOGIC ---
-  const steps = document.querySelectorAll('.step');
-  const gateSteps = document.querySelectorAll('.gate-step');
-  const master = document.getElementById('master');
-  const mstatus = document.getElementById('mstatus');
-  const mmsg = document.getElementById('mmsg');
-  const flow = document.getElementById('bottom-flow');
-  const gate = document.getElementById('gate');
-
-  function updateMaster() {
-    const sDone = Array.from(steps).filter(s => s.checked).length;
-    const gDone = Array.from(gateSteps).filter(s => s.checked).length;
-    if (sDone === steps.length) {
-      gate.classList.add('armed');
-      gateSteps.forEach(gs => gs.disabled = false);
-      mstatus.innerText = "STANDBY";
-    } else {
-      gate.classList.remove('armed');
-      gateSteps.forEach(gs => { gs.disabled = true; gs.checked = false; });
-      mstatus.innerText = "NO-GO";
-    }
-    if (sDone === steps.length && gDone === gateSteps.length) {
-      mstatus.innerText = "GO";
-      mstatus.style.color = "var(--green)";
-      flow.style.display = "block";
-      window.scrollTo({ top: document.getElementById('exec-alert').offsetTop - 50, behavior: 'smooth' });
-    } else {
-      mstatus.style.color = "var(--ink)";
-      flow.style.display = "none";
-    }
-  }
-  [...steps, ...gateSteps].forEach(s => s.addEventListener('change', updateMaster));
-
-  // --- CALCULATORS ---
-  function calcBuffer() {
-    const dd = parseFloat(document.getElementById('maxDD').value);
-    const rpt = parseFloat(document.getElementById('riskPerTrade').value);
-    const disp = document.getElementById('bufferDisplay');
-    if (dd > 0 && rpt > 0) disp.innerHTML = `Buffer survives <b>${Math.floor(dd/rpt)}</b> consecutive losses.`;
-    else disp.innerText = "Enter data to calculate buffer.";
-  }
-
-  function calcPnL() {
-    const before = parseFloat(document.getElementById('balBefore').value) || 0;
-    const after = parseFloat(document.getElementById('balAfter').value) || 0;
-    const diff = after - before;
-    const display = document.getElementById('pnlResult');
-    const manualField = document.getElementById('manualPnL');
-
-    manualField.value = diff.toFixed(2);
-    display.innerText = `NET RESULT: ${diff >= 0 ? '+' : ''}$${diff.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-    
-    if (diff > 0) {
-      display.className = "pnl-output pnl-gain";
-    } else if (diff < 0) {
-      display.className = "pnl-output pnl-loss";
-    } else {
-      display.className = "pnl-output";
-    }
-  }
-
-  // --- TELEMETRY ---
-  function tick() {
-    const now = new Date();
-    document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-    const nyStr = now.toLocaleString("en-US", {timeZone: "America/New_York"});
-    const nyDate = new Date(nyStr);
-    const nyMins = (nyDate.getHours() * 60) + nyDate.getMinutes();
-    const isIn = nyMins >= (9*60+30) && nyMins <= 11*60;
-    const tag = document.getElementById('session-status');
-    const range = document.getElementById('local-range');
-    tag.innerText = isIn ? "IN WINDOW (NY AM)" : "OUTSIDE WINDOW";
-    tag.className = "session-tag " + (isIn ? "tag-in" : "tag-out");
-    range.className = isIn ? "range-in" : "range-out";
-    const diff = now.getTime() - nyDate.getTime();
-    const lS = new Date(nyDate.setHours(9, 30, 0, 0) + diff);
-    const lE = new Date(nyDate.setHours(11, 0, 0, 0) + diff);
-    range.innerText = `LOCAL: ${lS.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true})} - ${lE.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true})}`;
-  }
-  setInterval(tick, 1000); tick();
-
-  // --- IMAGES ---
-  function handlePreview(input) {
-    const file = input.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        document.getElementById('preview-img').src = e.target.result;
-        document.getElementById('preview-img').style.display = 'block';
-        document.getElementById('upload-hint').style.display = 'none';
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  // --- PERSISTENCE ---
-  async function commitInternalVisual() {
-    if (!db) return;
-    const overlay = document.getElementById('status-overlay');
-    overlay.style.display = 'flex';
-    try {
-      const target = document.getElementById('journal-capture-zone');
-      const canvas = await html2canvas(target, { backgroundColor: "#D1D4DC", scale: 1.5, useCORS: true });
-      const entry = { id: Date.now(), ts: new Date().toLocaleString(), img: canvas.toDataURL("image/jpeg", 0.8) };
-      const tx = db.transaction("trades", "readwrite");
-      tx.objectStore("trades").add(entry);
-      tx.oncomplete = () => { overlay.style.display = 'none'; alert("VISUAL LOG COMMITTED."); };
-    } catch (e) { overlay.style.display = 'none'; alert(e); }
-  }
-
-  function loadInternalGallery() {
-    const g = document.getElementById('internal-gallery');
-    g.innerHTML = '<div style="font-family:var(--mono); text-align:center; padding:20px;">Fetching logs...</div>';
-    const tx = db.transaction("trades", "readonly");
-    tx.objectStore("trades").getAll().onsuccess = e => {
-      const logs = e.target.result;
-      if (!logs.length) { g.innerHTML = '<div class="panel" style="padding:40px; text-align:center; color:var(--ink-faint); font-family:var(--mono);">Empty History.</div>'; return; }
-      logs.sort((a,b) => b.id - a.id);
-      g.innerHTML = logs.map(l => `
-        <div class="history-item">
-          <div class="history-meta"><span>RECORD: ${l.ts}</span><button class="btn" style="padding:4px 10px; width:auto; border-color:white; color:white; font-size:9px;" onclick="deleteEntry(${l.id})">DELETE</button></div>
-          <div class="history-thumb" onclick="openLightbox('${l.img}')"><img src="${l.img}"></div>
+          <div class="btn-row">
+            <button class="btn btn-commit" onclick="commitToDatabase()">Commit to Database</button>
+            <button class="btn btn-save" onclick="downloadPNG()">Download Photo</button>
+            <button class="btn btn-reset" onclick="resetSession()">Reset Hub</button>
+          </div>
         </div>
-      `).join('');
+      </section>
+
+      <!-- DATABASE GALLERY -->
+      <section id="page-journal" class="page">
+        <h3>Internal Visual Archives</h3>
+        <div id="gallery-container" class="gallery"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // --- DATABASE ENGINE ---
+    let db;
+    const dbReq = indexedDB.open("FeX_DeepArchive_DB", 1);
+    dbReq.onupgradeneeded = e => {
+      db = e.target.result;
+      db.createObjectStore("logs", { keyPath: "id" });
     };
-  }
+    dbReq.onsuccess = e => db = e.target.result;
 
-  function openLightbox(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'block'; }
-  function deleteEntry(id) { if(confirm("Delete record?")) { const tx = db.transaction("trades", "readwrite"); tx.objectStore("trades").delete(id); tx.oncomplete = () => loadInternalGallery(); } }
+    // --- NAVIGATION ---
+    function switchPage(id, el) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      el.classList.add('active');
+      if (id === 'journal') loadGallery();
+    }
 
-  function downloadManualPNG() {
-    const target = document.getElementById('journal-capture-zone');
-    html2canvas(target, { backgroundColor: "#D1D4DC", scale: 2, useCORS: true }).then(canvas => {
-      const link = document.createElement('a');
-      link.download = `FeX_Journal_${Date.now()}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    });
-  }
+    // --- LOGIC ENGINE ---
+    const steps = document.querySelectorAll('.step');
+    const gateSteps = document.querySelectorAll('.gate-step');
+    const mstatus = document.getElementById('mstatus');
+    const mmsg = document.getElementById('mmsg');
+    const gate = document.getElementById('gate');
+    const bottomFlow = document.getElementById('bottom-flow');
 
-  function resetSession() { if(confirm("Reset screen?")) window.location.reload(); }
-</script>
+    function updateOS() {
+      const sDone = Array.from(steps).filter(s => s.checked).length;
+      const gDone = Array.from(gateSteps).filter(s => s.checked).length;
+
+      if (sDone === steps.length) {
+        gate.classList.add('armed');
+        gateSteps.forEach(gs => gs.disabled = false);
+        mstatus.innerText = "STANDBY";
+        mmsg.innerText = "Gate armed. Complete final Go/No-Go validation.";
+      } else {
+        gate.classList.remove('armed');
+        gateSteps.forEach(gs => { gs.disabled = true; gs.checked = false; });
+        mstatus.innerText = "NO-GO";
+        mmsg.innerText = "Complete Deployment Stages S1-S4 to arm the gate.";
+      }
+
+      if (sDone === steps.length && gDone === gateSteps.length) {
+        mstatus.innerText = "GO";
+        mstatus.style.color = "var(--green)";
+        bottomFlow.style.display = "block";
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      } else {
+        mstatus.style.color = "var(--ink)";
+        bottomFlow.style.display = "none";
+      }
+    }
+    [...steps, ...gateSteps].forEach(s => s.addEventListener('change', updateOS));
+
+    function calcBuffer() {
+      const dd = parseFloat(document.getElementById('maxDD').value);
+      const rpt = parseFloat(document.getElementById('riskAmt').value);
+      const disp = document.getElementById('bufferDisplay');
+      if (dd > 0 && rpt > 0) disp.innerHTML = `Buffer survives <b>${Math.floor(dd/rpt)}</b> consecutive losses.`;
+      else disp.innerText = "Survival math pending...";
+    }
+
+    function calcPnL() {
+      const b = parseFloat(document.getElementById('balBefore').value) || 0;
+      const a = parseFloat(document.getElementById('balAfter').value) || 0;
+      const d = a - b;
+      const res = document.getElementById('pnlResult');
+      res.innerText = `RESULT: ${d >= 0 ? '+' : ''}$${d.toLocaleString(undefined, {minimumFractionDigits:2})}`;
+      res.className = "pnl-output " + (d > 0 ? "gain" : d < 0 ? "loss" : "");
+    }
+
+    // --- TELEMETRY ---
+    function tick() {
+      const now = new Date();
+      document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+      const nyStr = now.toLocaleString("en-US", {timeZone: "America/New_York"});
+      const nyDate = new Date(nyStr);
+      const nyMins = (nyDate.getHours()*60) + nyDate.getMinutes();
+      const inW = nyMins >= (9*60+30) && nyMins <= 11*60;
+      const tag = document.getElementById('session-tag');
+      tag.innerText = inW ? "IN WINDOW (NY AM)" : "OUTSIDE WINDOW";
+      tag.className = "session-pill " + (inW ? "pill-in" : "pill-out");
+      const diff = now.getTime() - nyDate.getTime();
+      const lS = new Date(nyDate.setHours(9, 30, 0, 0) + diff);
+      const lE = new Date(nyDate.setHours(11, 0, 0, 0) + diff);
+      document.getElementById('local-range').innerText = `LOCAL: ${lS.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true})} - ${lE.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true})}`;
+    }
+    setInterval(tick, 1000); tick();
+
+    // --- ARCHIVING HUB ---
+    function handlePreview(i) {
+      const file = i.files[0];
+      if (file) {
+        const r = new FileReader();
+        r.onload = e => { 
+          document.getElementById('preview-img').src = e.target.result; 
+          document.getElementById('preview-img').style.display='block'; 
+          document.getElementById('upload-hint').style.display='none';
+        };
+        r.readAsDataURL(file);
+      }
+    }
+
+    async function commitToDatabase() {
+      const overlay = document.getElementById('status-overlay');
+      overlay.style.display = 'flex';
+      
+      const logicArea = document.getElementById('j-logic');
+      const psyArea = document.getElementById('j-psy');
+      
+      // CAPTURE ALL TEXT DATA SEPARATELY
+      const textData = {
+        bias: document.getElementById('biasInput').value,
+        fin: document.getElementById('pnlResult').innerText,
+        logic: logicArea.value,
+        psy: psyArea.value,
+        buffer: document.getElementById('bufferDisplay').innerText
+      };
+
+      // FORCE EXPAND TEXTAREAS
+      const oldLogicH = logicArea.style.height;
+      const oldPsyH = psyArea.style.height;
+      logicArea.style.height = logicArea.scrollHeight + "px";
+      psyArea.style.height = psyArea.scrollHeight + "px";
+
+      try {
+        const target = document.getElementById('journal-capture-zone');
+        const canvas = await html2canvas(target, { backgroundColor: "#D1D4DC", scale: 2, useCORS: true });
+        
+        // REVERT UI
+        logicArea.style.height = oldLogicH;
+        psyArea.style.height = oldPsyH;
+
+        const entry = {
+          id: Date.now(),
+          ts: new Date().toLocaleString(),
+          img: canvas.toDataURL("image/jpeg", 0.8),
+          data: textData
+        };
+
+        const tx = db.transaction("logs", "readwrite");
+        tx.objectStore("logs").add(entry);
+        tx.oncomplete = () => {
+          overlay.style.display = 'none';
+          alert("TRADE COMMITTED TO DEEP ARCHIVE.");
+        };
+      } catch (err) {
+        overlay.style.display = 'none';
+        alert("ARCHIVE FAILURE: " + err);
+      }
+    }
+
+    function loadGallery() {
+      const g = document.getElementById('gallery-container');
+      g.innerHTML = '<div style="text-align:center; padding:50px;">DECRYPTING ARCHIVES...</div>';
+      
+      const tx = db.transaction("logs", "readonly");
+      tx.objectStore("logs").getAll().onsuccess = e => {
+        const logs = e.target.result.sort((a,b) => b.id - a.id);
+        if(!logs.length) {
+          g.innerHTML = '<div class="panel" style="padding:100px; text-align:center;">EMPTY DATABASE.</div>';
+          return;
+        }
+        g.innerHTML = logs.map(l => `
+          <div class="history-card">
+            <div class="h-meta">
+              <span>RECORD_STAMP: ${l.ts}</span>
+              <div style="display:flex; gap:10px;">
+                <button class="report-btn" onclick="openReport(${l.id})">Tactical Report</button>
+                <button onclick="delLog(${l.id})" style="background:none; border:none; color:var(--red); cursor:pointer; font-family:var(--mono); font-size:10px;">[PURGE]</button>
+              </div>
+            </div>
+            <img src="${l.img}" class="h-preview" onclick="openLightboxOnly('${l.img}')">
+          </div>
+        `).join('');
+      };
+    }
+
+    function openReport(id) {
+      const tx = db.transaction("logs", "readonly");
+      tx.objectStore("logs").get(id).onsuccess = e => {
+        const l = e.result;
+        const dos = document.getElementById('lb-dossier');
+        document.getElementById('lb-img').src = l.img;
+        dos.innerHTML = `
+          <h2>TECHNICAL DOSSIER // ${l.ts}</h2>
+          <div class="d-section"><div class="d-label">Deployment Result</div><div class="d-value">${l.data.fin}</div></div>
+          <div class="d-section"><div class="d-label">Institutional Bias</div><div class="d-value">${l.data.bias || 'N/A'}</div></div>
+          <div class="d-section"><div class="d-label">Technical Narrative</div><div class="d-value">${l.data.logic || 'N/A'}</div></div>
+          <div class="d-section"><div class="d-label">Psychological State</div><div class="d-value">${l.data.psy || 'N/A'}</div></div>
+          <div class="d-section"><div class="d-label">Risk Context</div><div class="d-value">${l.data.buffer}</div></div>
+        `;
+        document.getElementById('lightbox').style.display = 'block';
+      };
+    }
+
+    function openLightboxOnly(src) {
+      document.getElementById('lb-img').src = src;
+      document.getElementById('lb-dossier').innerHTML = "";
+      document.getElementById('lightbox').style.display = 'block';
+    }
+
+    function closeReport() { document.getElementById('lightbox').style.display = 'none'; }
+    function delLog(id) { if(confirm("Confirm Permanent Purge?")) { db.transaction("logs","readwrite").objectStore("logs").delete(id).onsuccess = loadGallery; } }
+    function resetSession() { if(confirm("Clear Active Console?")) window.location.reload(); }
+    function downloadPNG() {
+      html2canvas(document.getElementById('journal-capture-zone'), { backgroundColor: "#D1D4DC", scale: 2 }).then(c => {
+        const link = document.createElement('a');
+        link.download = `FeX_Trade_${Date.now()}.png`;
+        link.href = c.toDataURL();
+        link.click();
+      });
+    }
+  </script>
 </body>
 </html>
