@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>THE EXECUTIONERS | Vanguard Command Center v23</title>
+  <title>THE EXECUTIONERS | Absolute Master Command v24</title>
   
-  <!-- Core Architecture: Typography & Capturing Engines -->
+  <!-- System Architecture: Technical Fonts & Visual Engines -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,34 +13,36 @@
 
   <style>
     :root {
-      /* Institutional Palette */
+      /* Palette: Institutional Grayscale */
       --bg: #D1D4DC;        /* Canvas */
       --ink: #050505;       /* Black */
       --panel: #FFFFFF;     /* Upclose */
       --panel-alt: #e9ebf0;
       --line: #787B86;      /* Slate */
-      --turquoise: #00CED1; /* Continuation State */
+      
+      /* High-Glow Highlight Palette */
+      --turquoise: #00CED1;
       --turquoise-glow: rgba(0, 206, 209, 0.45);
+      --amber: #E9A23B;
+      --amber-glow: rgba(233, 162, 59, 0.45);
       --red: #FF4D4D;
       --green: #27D38C;
-      --amber: #E9A23B;    /* Reversal State */
-      --amber-glow: rgba(233, 162, 59, 0.45);
       
-      /* Dynamic Logic */
+      /* Dynamic Logic Accent System */
       --current-accent: var(--turquoise);
       --current-glow: var(--turquoise-glow);
       
-      /* Typography */
+      /* Professional Typography */
       --mono: 'JetBrains Mono', monospace;
       --disp: 'Chakra Petch', sans-serif;
       --body: 'Inter', sans-serif;
 
-      /* Responsive Constants */
-      --sidebar-w: 290px;
+      /* UI Layout Constraints */
+      --sidebar-w: 300px;
       --safe-bottom: env(safe-area-inset-bottom);
     }
 
-    /* --- GLOBAL HUD STYLE --- */
+    /* --- GLOBAL INTERFACE HUD --- */
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--ink); }
@@ -52,7 +54,7 @@
       font-family: var(--body); overflow: hidden; 
     }
 
-    /* Atmosphere Scanline Overlay */
+    /* System Scanline overlay */
     .scanline {
       width: 100%; height: 2px; background: rgba(255, 255, 255, 0.04);
       position: fixed; top: 0; z-index: 10000; pointer-events: none;
@@ -60,124 +62,185 @@
     }
     @keyframes scan { from { top: 0; } to { top: 100%; } }
 
-    /* --- AUTHENTICATION GATE --- */
+    /* --- AUTHENTICATION GATE ENGINE --- */
     #auth-gate {
       position: fixed; inset: 0; background: var(--ink); z-index: 9999;
       display: flex; align-items: center; justify-content: center; padding: 20px;
-      transition: transform 0.7s cubic-bezier(0.85, 0, 0.15, 1);
+      transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
     }
     .auth-box {
       background: var(--bg); width: min(100%, 480px); padding: clamp(30px, 8vw, 55px); 
       border: 1px solid var(--turquoise); box-shadow: 0 0 60px var(--turquoise-glow);
       position: relative; clip-path: polygon(0 0, 100% 0, 100% 92%, 92% 100%, 0 100%);
     }
-    .auth-box h2 { font-family: var(--disp); font-size: clamp(24px, 5vw, 32px); text-transform: uppercase; margin: 0 0 10px; letter-spacing: 2px; }
-    
+    .auth-box h2 { font-family: var(--disp); font-size: clamp(24px, 5vw, 32px); text-transform: uppercase; margin: 0 0 10px; letter-spacing: 3px; color: var(--ink); }
+    .auth-box p { font-size: 13px; color: var(--line); line-height: 1.5; margin-bottom: 25px; }
+
     .input-group { margin-bottom: 25px; }
     .input-group label { display: block; font-family: var(--mono); font-size: 10px; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; color: var(--line); }
-    .input-group input { width: 100%; padding: 16px; border: 1px solid var(--line); background: #fff; font-family: var(--mono); font-size: 14px; border-radius: 2px; transition: 0.3s; }
+    .input-group input { 
+      width: 100%; padding: 16px; border: 1px solid var(--line); background: #fff; 
+      font-family: var(--mono); font-size: 14px; border-radius: 2px; transition: 0.3s;
+    }
     .input-group input:focus { border-color: var(--turquoise); box-shadow: 0 0 15px var(--turquoise-glow); }
 
-    .remember-check { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; cursor: pointer; }
-    .remember-check input { width: 18px; height: 18px; accent-color: var(--turquoise); }
-    .remember-check span { font-family: var(--mono); font-size: 10px; text-transform: uppercase; font-weight: 700; }
+    .remember-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; cursor: pointer; user-select: none; }
+    .remember-wrap input { width: 20px; height: 20px; accent-color: var(--turquoise); }
+    .remember-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--ink); }
 
-    .btn-auth { width: 100%; padding: 20px; background: var(--ink); color: var(--turquoise); border: 1px solid var(--turquoise); font-family: var(--mono); font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.3s; letter-spacing: 2px; }
+    .btn-auth { 
+      width: 100%; padding: 20px; background: var(--ink); color: var(--turquoise); border: 1px solid var(--turquoise);
+      font-family: var(--mono); font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.3s; letter-spacing: 2px;
+    }
     .btn-auth:hover { background: var(--turquoise); color: var(--ink); box-shadow: 0 0 30px var(--turquoise); }
     .auth-toggle { font-size: 11px; font-family: var(--mono); text-align: center; margin-top: 30px; cursor: pointer; color: var(--line); text-transform: uppercase; text-decoration: underline; }
 
-    /* --- MOBILE UI --- */
-    .mobile-top-bar {
+    /* --- MOBILE HUD INTERFACE --- */
+    .mobile-header {
       display: none; height: 60px; background: var(--ink); border-bottom: 1px solid var(--current-accent);
       padding: 0 20px; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     }
     .m-logo { font-family: var(--disp); color: #fff; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; }
     .m-logo b { color: var(--current-accent); transition: color 0.3s; }
 
-    .mobile-nav {
+    .mobile-footer-nav {
       display: none; position: fixed; bottom: 0; left: 0; right: 0; height: calc(70px + var(--safe-bottom));
       background: var(--ink); border-top: 1px solid var(--current-accent);
-      z-index: 100; padding-bottom: var(--safe-bottom); grid-template-columns: repeat(4, 1fr); transition: 0.3s;
+      z-index: 100; padding: 0 10px var(--safe-bottom); grid-template-columns: repeat(4, 1fr); transition: border-color 0.3s;
     }
-    .m-nav-item {
+    .m-nav-link {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      color: var(--line); font-family: var(--mono); font-size: 10px; text-transform: uppercase; cursor: pointer;
+      color: var(--line); font-family: var(--mono); font-size: 10px; text-transform: uppercase; cursor: pointer; transition: 0.3s;
     }
-    .m-nav-item.active { color: var(--current-accent); }
-    .m-nav-item span { font-size: 22px; margin-bottom: 4px; font-weight: 900; }
+    .m-nav-link.active { color: var(--current-accent); }
+    .m-nav-link span { font-size: 20px; margin-bottom: 4px; font-weight: 900; }
 
-    /* --- APP SHELL --- */
-    .app-shell { display: flex; height: 100vh; width: 100vw; background: var(--bg); visibility: hidden; opacity: 0; transition: opacity 0.5s; }
-    .app-shell.active { visibility: visible; opacity: 1; }
-
+    /* --- DESKTOP SIDEBAR NAVIGATION --- */
     .sidebar {
       width: var(--sidebar-w); background: var(--ink); color: white; display: flex; flex-direction: column; flex-shrink: 0;
       border-right: 1px solid var(--current-accent); position: relative; transition: border-color 0.4s;
     }
     .sidebar-header { padding: 50px 35px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-    .sidebar-header h2 { font-family: var(--disp); font-size: 24px; margin: 0; color: #fff; line-height: 1; }
+    .sidebar-header h2 { font-family: var(--disp); font-size: 24px; margin: 0; color: #fff; letter-spacing: 1px; }
     .sidebar-header .highlight { color: var(--current-accent); text-shadow: 0 0 15px var(--current-glow); transition: 0.3s; }
 
-    .nav-list { flex-grow: 1; padding: 20px 0; overflow-y: auto; }
+    .nav-list { flex-grow: 1; padding: 25px 0; overflow-y: auto; }
     .nav-link {
       padding: 18px 35px; font-family: var(--mono); font-size: 11px; text-transform: uppercase;
       cursor: pointer; letter-spacing: 2px; color: var(--line); transition: 0.3s;
       display: flex; align-items: center; gap: 15px; border-left: 3px solid transparent;
     }
     .nav-link:hover { color: var(--current-accent); background: rgba(255, 255, 255, 0.02); }
-    .nav-link.active { background: rgba(255, 255, 255, 0.03); color: var(--current-accent); border-left-color: var(--current-accent); font-weight: 700; }
+    .nav-link.active { background: rgba(255, 255, 255, 0.04); color: var(--current-accent); border-left-color: var(--current-accent); font-weight: 700; }
+
+    #admin-nav { display: none; color: var(--red); border-top: 1px solid var(--red); margin-top: 20px; }
+
+    /* --- CORE VIEWPORT HUD --- */
+    .app-shell { display: flex; height: 100vh; width: 100vw; background: var(--bg); visibility: hidden; opacity: 0; transition: opacity 0.5s; }
+    .app-shell.active { visibility: visible; opacity: 1; }
 
     .viewport { flex-grow: 1; overflow-y: auto; padding: clamp(20px, 5vw, 60px); background: var(--bg); position: relative; scrollbar-gutter: stable; }
-    .viewport::before { content: ""; position: fixed; inset: 0; pointer-events: none; background-image: radial-gradient(var(--line) 0.5px, transparent 0.5px); background-size: 45px 45px; opacity: 0.15; }
+    .viewport::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none;
+      background-image: radial-gradient(var(--line) 0.5px, transparent 0.5px);
+      background-size: 45px 45px; opacity: 0.15;
+    }
 
     .section { display: none; max-width: 1200px; margin: 0 auto; padding-bottom: 120px; }
     .section.active { display: block; animation: sectionFade 0.5s ease-out forwards; }
     @keyframes sectionFade { from { opacity: 0; transform: translateY(20px); filter: blur(10px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
 
-    h3 { font-family: var(--disp); font-size: clamp(28px, 6vw, 42px); text-transform: uppercase; border-bottom: 3px solid var(--current-accent); padding-bottom: 10px; margin-bottom: 45px; transition: border-color 0.3s; color: var(--ink); }
+    h3 { font-family: var(--disp); font-size: clamp(28px, 6vw, 42px); text-transform: uppercase; border-bottom: 3px solid var(--current-accent); padding-bottom: 15px; margin-bottom: 45px; transition: border-color 0.3s; color: var(--ink); }
 
-    /* --- CARDS --- */
-    .card { background: var(--panel); border: 1px solid var(--line); padding: 35px; border-radius: 2px; box-shadow: 10px 10px 0 var(--line); margin-bottom: 30px; position: relative; }
-    .card-neon { border-color: var(--current-accent); box-shadow: 0 0 25px var(--current-glow); transition: 0.3s; }
+    /* --- VANGUARD PIPELINE INTERFACE --- */
+    .pipeline-wrapper { position: relative; padding: 20px 0 60px 60px; }
+    .pipeline-spine { position: absolute; left: 24px; top: 0; bottom: 0; width: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+    .pipeline-progress { position: absolute; left: 24px; top: 0; width: 4px; height: 35%; background: var(--current-accent); box-shadow: 0 0 20px var(--current-glow); border-radius: 10px; transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    
+    .pipe-step { position: relative; margin-bottom: 60px; }
+    .pipe-indicator {
+      position: absolute; left: -52px; top: 5px; width: 32px; height: 32px;
+      background: var(--ink); border: 2px solid var(--line); border-radius: 50%;
+      z-index: 5; display: grid; place-items: center; transition: 0.4s;
+    }
+    .pipe-step.active .pipe-indicator { border-color: var(--current-accent); box-shadow: 0 0 15px var(--current-glow); }
+    .pipe-indicator::after { content: ""; width: 10px; height: 10px; background: var(--line); border-radius: 50%; }
+    .pipe-step.active .pipe-indicator::after { background: var(--current-accent); animation: corePulse 2s infinite; }
+    @keyframes corePulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.5); } }
 
-    /* --- TRADING TERMINAL ENGINE --- */
+    .pipe-card {
+      background: var(--panel); border: 1px solid var(--line);
+      clip-path: polygon(0 0, 96% 0, 100% 12%, 100% 100%, 4% 100%, 0 88%);
+      padding: 0; overflow: hidden; transition: 0.4s;
+      box-shadow: 10px 10px 0 var(--line);
+    }
+    .pipe-step.active .pipe-card { border-color: var(--current-accent); box-shadow: 10px 10px 0 var(--current-glow); }
+    .pipe-card:hover { transform: translateX(20px); }
+
+    .pipe-head {
+      background: var(--panel-alt); padding: 18px 30px; border-bottom: 1px solid var(--line);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .pipe-title { font-family: var(--disp); font-size: clamp(16px, 4vw, 22px); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ink); }
+    .pipe-status { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 2px; }
+
+    .pipe-content { padding: 30px; }
+    .pipe-desc { font-size: 15px; line-height: 1.7; color: var(--ink-dim); margin-bottom: 25px; }
+    .pipe-specs {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+      padding-top: 20px; border-top: 1px solid var(--panel-alt);
+    }
+    .spec-bit { font-family: var(--mono); font-size: 10px; color: var(--line); text-transform: uppercase; letter-spacing: 1px; }
+    .spec-bit b { display: block; color: var(--ink); font-size: 13px; margin-top: 6px; font-weight: 700; }
+
+    /* --- NATIVE TRADING OS ENGINE HUD --- */
     .os-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--ink); padding-bottom: 15px; margin-bottom: 35px; gap: 15px; flex-wrap: wrap; }
     .os-clock { font-size: clamp(32px, 8vw, 52px); font-weight: 700; font-family: var(--mono); letter-spacing: -2px; line-height: 1; }
-    .os-tag { font-size: 12px; font-family: var(--mono); font-weight: 800; padding: 10px 20px; border-radius: 2px; text-transform: uppercase; margin-top: 15px; display: inline-block; }
+    
+    .os-tag { font-size: 12px; font-family: var(--mono); font-weight: 800; padding: 10px 20px; border-radius: 2px; text-transform: uppercase; margin-top: 15px; display: inline-block; transition: 0.4s; }
     .os-tag-out { background: var(--line); color: #fff; }
     .os-tag-in { background: #fff; border: 1px solid var(--ink); color: var(--ink); box-shadow: 0 0 25px #fff; }
 
     .os-master-bar { border: 1px solid var(--ink); background: #fff; padding: clamp(25px, 5vw, 40px); margin-bottom: 30px; box-shadow: 8px 8px 0 var(--line); position: relative; border-left: 15px solid var(--current-accent); transition: border-color 0.3s; }
     .os-m-status { font-family: var(--disp); font-size: clamp(42px, 12vw, 72px); font-weight: 800; line-height: 1; text-transform: uppercase; transition: color 0.3s; }
+    .os-m-msg { font-family: var(--mono); font-size: 13px; color: var(--line); margin-top: 12px; letter-spacing: 1px; }
 
+    /* Tactical Setup Selector */
     .setup-toggle { display: flex; gap: 8px; padding: 15px; background: var(--panel-alt); border-bottom: 1px solid var(--line); }
-    .s-btn { flex: 1; padding: 14px; font-family: var(--mono); font-size: 11px; font-weight: 700; border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; background: #fff; transition: 0.3s; color: var(--line); letter-spacing: 1px; }
+    .s-btn { 
+      flex: 1; padding: 14px; font-family: var(--mono); font-size: 11px; font-weight: 700; 
+      border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; 
+      background: #fff; transition: 0.3s; color: var(--line); letter-spacing: 1px;
+    }
     .s-btn.active[onclick*="continuation"] { background: var(--ink); color: var(--turquoise); border-color: var(--turquoise); box-shadow: 0 0 20px var(--turquoise-glow); }
     .s-btn.active[onclick*="reversal"] { background: var(--ink); color: var(--amber); border-color: var(--amber); box-shadow: 0 0 20px var(--amber-glow); }
 
     .os-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-    .os-panel { border: 1px solid var(--line); background: #fff; border-radius: 4px; overflow: hidden; height: fit-content; box-shadow: 4px 4px 0 var(--panel-alt); transition: border-color 0.4s; }
+    .os-panel { border: 1px solid var(--line); background: #fff; border-radius: 4px; overflow: hidden; height: fit-content; box-shadow: 4px 4px 0 var(--panel-alt); transition: border-color 0.3s; }
     .os-p-head { background: var(--panel-alt); padding: 20px; border-bottom: 1px solid var(--line); font-family: var(--disp); font-weight: 700; font-size: 16px; text-transform: uppercase; display: flex; align-items: center; gap: 15px; }
     .os-seq { background: var(--ink); color: #fff; padding: 4px 10px; font-size: 11px; font-family: var(--mono); border-radius: 2px; }
 
-    .os-check { display: flex; gap: 18px; padding: 20px 24px; cursor: pointer; align-items: flex-start; border-bottom: 1px solid var(--panel-alt); }
+    .os-check { display: flex; gap: 18px; padding: 20px 24px; cursor: pointer; align-items: flex-start; transition: 0.1s; border-bottom: 1px solid var(--panel-alt); }
     .os-check:last-child { border-bottom: none; }
     .os-check:hover { background: var(--panel-alt); }
-    .os-check input { width: 24px; height: 24px; accent-color: var(--ink); flex-shrink: 0; margin-top: 2px; }
-    .os-c-text { font-size: 15px; line-height: 1.5; font-weight: 500; }
+    .os-check input { width: 26px; height: 26px; accent-color: var(--ink); cursor: pointer; margin-top: 2px; flex-shrink: 0; }
+    .os-c-text { font-size: 15px; line-height: 1.5; font-weight: 500; color: var(--ink-dim); }
+    .os-c-text b { font-weight: 700; color: var(--ink); }
     .os-note { display: block; font-size: 11px; color: var(--line); font-family: var(--mono); margin-top: 6px; }
 
+    /* GATE HUD */
     .os-gate { position: relative; border: 2px solid var(--line); transition: 0.6s; grid-column: 1 / -1; margin-top: 10px; }
     .os-gate.armed { border-color: var(--current-accent); box-shadow: 0 0 40px var(--current-glow); }
     .os-scan-line { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--current-glow), transparent); pointer-events: none; }
-    .os-gate.armed .os-scan-line { animation: scan-os 4s linear infinite; }
+    .os-gate.armed .os-scan-line { animation: scan-os 3.5s linear infinite; }
     @keyframes scan-os { from { left: -100%; } to { left: 100%; } }
 
     #os-bottom-flow { display: none; margin-top: 60px; border-top: 5px solid var(--ink); padding-top: 60px; }
     #os-exec-alert { background: var(--ink); color: #fff; padding: 35px; text-align: center; font-family: var(--mono); font-weight: 700; animation: blink 1.2s infinite; letter-spacing: 8px; margin-bottom: 45px; font-size: 22px; border-radius: 4px; border: 1px solid var(--current-accent); }
     @keyframes blink { 50% { opacity: 0.2; } }
 
-    .os-pnl-output { padding: 45px; text-align: center; font-family: var(--disp); font-size: clamp(32px, 8vw, 48px); font-weight: 800; border: 2px solid var(--line); margin-top: 25px; transition: 0.5s; }
+    /* FINANCIALS */
+    .os-pnl-output { padding: 45px; text-align: center; font-family: var(--disp); font-size: clamp(32px, 8vw, 48px); font-weight: 800; margin-top: 25px; border: 2px solid var(--line); border-radius: 4px; transition: 0.5s; }
     .os-pnl-gain { background: #fff; color: var(--green); border-color: var(--green); box-shadow: 0 0 30px rgba(39, 211, 140, 0.3); }
     .os-pnl-loss { background: var(--line); color: #fff; border-color: var(--ink); }
 
@@ -188,46 +251,64 @@
 
     .os-screenshot { border: 2px dashed var(--line); background: var(--panel-alt); height: 450px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; margin: 15px; border-radius: 4px; position: relative; }
     .os-screenshot img { width: 100%; height: 100%; object-fit: contain; position: absolute; display: none; }
+    .os-screenshot span { font-family: var(--mono); font-size: 12px; color: var(--line); text-transform: uppercase; letter-spacing: 2px; }
 
-    /* --- HISTORY & ARCHIVE HUB --- */
+    /* --- HISTORY & DATABASE HUB --- */
     #gallery-container { display: grid; gap: 40px; }
-    .history-card { border: 1px solid var(--line); background: #fff; border-radius: 4px; overflow: hidden; box-shadow: 12px 12px 0 var(--line); transition: 0.3s; cursor: zoom-in; }
+    .history-card { border: 1px solid var(--line); background: #fff; border-radius: 4px; overflow: hidden; box-shadow: 12px 12px 0 var(--line); transition: transform 0.3s; }
+    .history-card:hover { transform: translateY(-5px); cursor: zoom-in; }
     .h-meta { padding: 18px 25px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
     .h-img-wrap { width: 100%; display: block; max-height: 550px; object-fit: cover; border-top: 1px solid rgba(255,255,255,0.1); }
-    .dossier-btn { background: var(--turquoise); color: var(--ink); padding: 6px 12px; border: none; font-weight: 800; font-family: var(--mono); font-size: 10px; cursor: pointer; text-transform: uppercase; }
 
     #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 10001; padding: 40px; overflow-y: auto; text-align: center; }
     #lightbox img { max-width: 100%; border: 4px solid #fff; box-shadow: 0 0 60px rgba(0,0,0,0.5); }
-    .close-lb { position: fixed; top: 30px; right: 30px; color: #fff; background: var(--red); padding: 15px 30px; font-family: var(--mono); font-weight: 700; cursor: pointer; border-radius: 4px; z-index: 10002; }
+    .close-lb { position: fixed; top: 30px; right: 30px; color: #fff; background: var(--red); padding: 15px 30px; font-family: var(--mono); font-weight: 700; cursor: pointer; border-radius: 4px; z-index: 10002; text-transform: uppercase; }
+
+    /* --- ADMIN SYSTEM --- */
+    .admin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+    .admin-stat { background: var(--ink); color: #fff; padding: 40px; border: 1px solid var(--red); border-radius: 4px; box-shadow: 0 15px 30px rgba(255, 77, 77, 0.1); }
+    .admin-stat h5 { margin: 0; font-family: var(--mono); color: var(--red); font-size: 11px; text-transform: uppercase; letter-spacing: 3px; }
+    .admin-stat p { font-size: 42px; font-family: var(--disp); margin: 15px 0 0; font-weight: 700; }
+
+    .user-table { width: 100%; border-collapse: collapse; margin-top: 30px; background: #fff; border: 1px solid var(--line); min-width: 600px; }
+    .user-table-wrap { width: 100%; overflow-x: auto; }
+    .user-table th { background: var(--ink); color: #fff; padding: 18px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; text-align: left; }
+    .user-table td { padding: 18px; border-bottom: 1px solid var(--panel-alt); font-family: var(--mono); font-size: 13px; color: var(--ink); }
+
+    .btn-action-panel { flex: 1; padding: 22px; font-family: var(--mono); font-weight: 700; cursor: pointer; text-transform: uppercase; border: 1px solid var(--ink); font-size: 12px; transition: 0.3s; }
+    .btn-action-panel:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
 
     #status-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 10002; color: white; flex-direction: column; align-items: center; justify-content: center; font-family: var(--mono); letter-spacing: 3px; text-align: center; }
 
     @media (max-width: 1100px) {
       .sidebar { display: none; }
-      .mobile-top-bar, .mobile-nav { display: grid; }
+      .mobile-header, .mobile-footer-nav { display: grid; }
       .viewport { padding: 100px 15px 120px; }
-      .os-grid, .admin-grid { grid-template-columns: 1fr; }
+      .os-grid, .admin-grid, .pipe-specs { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body data-setup="continuation">
 
   <div class="scanline"></div>
-  <div id="lightbox" onclick="this.style.display='none'"><span class="close-lb">CLOSE FILE [X]</span><img id="lb-img"><div id="lb-text" style="color:#fff; text-align:left; max-width:1000px; margin:40px auto; font-family:var(--body); background:var(--ink); padding:40px; border:1px solid #333;"></div></div>
+  <div id="lightbox" onclick="this.style.display='none'"><span class="close-lb">CLOSE RECORD [X]</span><img id="lb-img"></div>
   
   <div id="status-overlay">
     <div style="font-size: 28px; margin-bottom: 25px; color: var(--current-accent);">DECRYPTING VISUAL BUFFER...</div>
     <div style="font-size: 12px; color: #fff; opacity: 0.6;">WRITING TO LOCAL ENCRYPTED DATABASE.</div>
   </div>
 
-  <!-- AUTHENTICATION GATE -->
+  <!-- AUTHENTICATION GATE HUD -->
   <div id="auth-gate">
     <div class="auth-box" id="login-view">
-      <div style="font-family: var(--mono); font-size: 9px; color: var(--turquoise); margin-bottom: 12px; letter-spacing: 3px;">UPLINK_PROTOCOL_V23</div>
+      <div style="font-family: var(--mono); font-size: 9px; color: var(--turquoise); margin-bottom: 12px; letter-spacing: 3px;">UPLINK_PROTOCOL_V24</div>
       <h2>THE EXECUTIONERS</h2>
-      <div class="input-group"><label>Operator Identifier</label><input type="text" id="login-user" placeholder="NAME_IDENT"></div>
+      <div class="input-group"><label>Operator Identity</label><input type="text" id="login-user" placeholder="NAME_IDENT"></div>
       <div class="input-group"><label>Portal Access Key</label><input type="password" id="login-pass" placeholder="••••••••"></div>
-      <label class="remember-check"><input type="checkbox" id="remember-me"><span>Maintain Machine Affinity</span></label>
+      <label class="remember-wrap">
+        <input type="checkbox" id="remember-me">
+        <span class="remember-label">Maintain Affinity</span>
+      </label>
       <button class="btn-auth" onclick="handleLogin()">Establish Link</button>
       <div class="auth-toggle" onclick="toggleAuthView('signup')">New Operator? Request Terminal Access</div>
     </div>
@@ -243,92 +324,114 @@
   </div>
 
   <!-- MOBILE HUD -->
-  <header class="mobile-top-bar">
+  <header class="mobile-header">
     <div class="m-logo">THE <b>EXECUTIONERS</b></div>
     <div style="font-family: var(--mono); color: var(--current-accent); font-size: 10px;" id="m-op-display">OP_IDENT</div>
   </header>
 
-  <nav class="mobile-nav">
-    <div class="m-nav-item active" onclick="navTo('dash', this)"><span>▤</span>Dash</div>
-    <div class="m-nav-item" onclick="navTo('terminal', this)"><span>⌨</span>OS</div>
-    <div class="m-nav-item" onclick="navTo('pipeline', this)"><span>◈</span>Training</div>
-    <div class="m-nav-item" onclick="navTo('journal', this)"><span>◙</span>Logs</div>
+  <nav class="mobile-footer-nav">
+    <div class="m-nav-link active" onclick="navTo('dash', this)"><span>▤</span>Dash</div>
+    <div class="m-nav-link" onclick="navTo('terminal', this)"><span>⌨</span>OS</div>
+    <div class="m-nav-link" onclick="navTo('pipeline', this)"><span>◈</span>Pipeline</div>
+    <div class="m-nav-link" onclick="navTo('journal', this)"><span>◙</span>Logs</div>
   </nav>
 
   <div class="app-shell" id="main-app">
     
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR NAVIGATION -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <div style="font-family:var(--mono); font-size:8px; color:var(--current-accent); letter-spacing:4px; margin-bottom:10px;">CORE_NODE: ACTIVE</div>
+        <div style="font-family:var(--mono); font-size:8px; color:var(--current-accent); letter-spacing:4px; margin-bottom:10px; transition: 0.3s;">NODE_STABLE: ONLINE</div>
         <h2>THE <span class="highlight">EXECUTIONERS</span></h2>
       </div>
+
       <nav class="nav-list">
         <div class="nav-link active" onclick="navTo('dash', this)"><span class="nav-text">Operational Dash</span></div>
         <div class="nav-link" onclick="navTo('terminal', this)"><span class="nav-text">Trading Terminal (OS)</span></div>
-        <div class="nav-link" onclick="navTo('pipeline', this)"><span class="nav-text">Training Pipeline</span></div>
+        <div class="nav-link" onclick="navTo('pipeline', this)"><span class="nav-text">Vanguard Pipeline</span></div>
         <div class="nav-link" onclick="navTo('journal', this)"><span class="nav-text">Visual Journal</span></div>
+        <div class="nav-link" onclick="navTo('discord', this)"><span class="nav-text">Comm Frequency Hub</span></div>
+        <div class="nav-link" onclick="navTo('qa', this)"><span class="nav-text">Direct Q&A Transmit</span></div>
+        <div class="nav-link" onclick="navTo('calls', this)"><span class="nav-text">1:1 Sync Booking</span></div>
+        
         <div class="nav-link" id="admin-nav" onclick="navTo('admin', this)"><span class="nav-text">SYSTEM OVERRIDE</span></div>
-        <div class="nav-link" style="margin-top:40px; color:var(--red);" onclick="handleLogout()"><span class="nav-text">Terminate Uplink</span></div>
+        <div class="nav-link" style="margin-top:40px; color:var(--red);" onclick="handleLogout()"><span class="nav-text">Terminate Session</span></div>
       </nav>
+
       <div style="padding: 35px; border-top: 1px solid rgba(255,255,255,0.05); font-family: var(--mono); font-size: 9px; color: var(--line);">
-        OPERATOR: <span id="op-name" style="color: var(--current-accent);">UNAUTHORIZED</span><br>
-        LOC: CAPE_TOWN.ZA // V23.0
+        OPERATOR: <span id="op-name" style="color: var(--current-accent); transition: 0.3s;">UNAUTHORIZED</span><br>
+        LOC: CAPE_TOWN.ZA // V24.0
       </div>
     </aside>
 
-    <!-- VIEWPORT -->
     <main class="viewport">
       
       <!-- DASHBOARD -->
       <section id="dash" class="section active">
-        <h3>Dashboard</h3>
-        <div class="card card-neon" style="background:var(--ink); color:#fff; padding:55px; border-left: 10px solid var(--current-accent);">
-          <h4 style="margin:0; font-family:var(--disp); color:var(--current-accent); font-size:36px;">WELCOME, <span id="dash-user">OPERATOR</span></h4>
-          <p style="font-size: 18px; opacity:0.8; line-height: 1.8; margin-top:25px;">Portal synchronized. Environment active. Follow the Pipeline and utilize the native Terminal for all high-intent activity.</p>
+        <h3>Operational Dashboard</h3>
+        <div class="card card-neon" style="background:var(--ink); color:#fff; padding:55px; border-left: 10px solid var(--current-accent); transition: 0.3s;">
+          <h4 style="margin:0; font-family:var(--disp); color:var(--current-accent); font-size:clamp(22px, 5vw, 36px); transition: 0.3s;">WELCOME, <span id="dash-user">OPERATOR</span></h4>
+          <p style="font-size: 18px; opacity:0.8; line-height: 1.8; margin-top:25px; max-width: 900px;">Portal synchronization successful. Your technical environment is active. Execute with precision, follow the Pipeline Modules, and utilize the native Terminal for all high-intent activity.</p>
+        </div>
+        
+        <div class="os-grid" style="margin-top: 40px;">
+          <div class="card">
+            <h5 style="margin:0; font-family:var(--mono); font-size:11px; color:var(--current-accent); letter-spacing:3px; transition: 0.3s;">SYSTEM FREQUENCY (DISCORD)</h5>
+            <p style="font-size:16px; margin:18px 0;">Synchronize daily bias and reviews with the cohort on Discord.</p>
+            <a href="https://discord.gg/TmrfvRCDF" target="_blank" style="background:var(--ink); color:#fff; padding:16px 35px; text-decoration:none; font-family:var(--mono); font-size:11px; display:inline-block; border-radius:2px; letter-spacing:2px;">JOIN SERVER →</a>
+          </div>
+          <div class="card">
+            <h5 style="margin:0; font-family:var(--mono); font-size:11px; color:var(--current-accent); letter-spacing:3px; transition: 0.3s;">PERFORMANCE SYNC</h5>
+            <p style="font-size:16px; margin:18px 0;">Schedule your bi-weekly performance deep-dive with Mihir.</p>
+            <a href="https://calendly.com/mihirramdhani/30min" target="_blank" style="background:var(--ink); color:#fff; padding:16px 35px; text-decoration:none; font-family:var(--mono); font-size:11px; display:inline-block; border-radius:2px; letter-spacing:2px;">BOOK CALENDLY →</a>
+          </div>
         </div>
       </section>
 
-      <!-- TRADING TERMINAL -->
+      <!-- TERMINAL (OS) -->
       <section id="terminal" class="section">
         <div class="os-header">
-          <div class="brand"><div style="font-family:var(--mono); font-size:10px; color:var(--line); letter-spacing:4px;">FEXECUTIONER_OS_V23</div><h2 style="margin:0; font-family:var(--disp); font-size:36px;">EXEC_TERMINAL</h2></div>
-          <div class="telemetry" style="text-align:right;"><div class="os-clock" id="clock">00:00:00</div><div id="session-status" class="os-tag os-tag-out">Checking...</div></div>
+          <div class="brand">
+            <div style="font-family:var(--mono); font-size:10px; color:var(--line); letter-spacing:4px;">FEXECUTIONER_OS_V24</div>
+            <h2 style="margin:0; font-family:var(--disp); font-size:36px;">EXEC_TERMINAL</h2>
+          </div>
+          <div class="telemetry" style="text-align:right;">
+            <div class="os-clock" id="clock">00:00:00</div>
+            <div id="session-status" class="os-tag os-tag-out">Checking Window...</div>
+          </div>
         </div>
 
-        <div class="os-master-bar"><div class="os-m-status" id="mstatus">NO-GO</div><div class="os-m-msg" id="mmsg">Complete sections S1–S4 to arm the gate.</div></div>
+        <div class="os-master-bar">
+          <div class="os-m-status" id="mstatus">NO-GO</div>
+          <div class="os-m-msg" id="mmsg">Complete sections S1–S4 to arm the execution gate.</div>
+        </div>
 
         <div class="os-grid">
-          <!-- S1 -->
           <div class="os-panel">
             <div class="os-p-head"><span class="os-seq">S1</span> Bias & HTF Gap</div>
             <div class="setup-toggle"><button class="s-btn active" id="btn-cont" onclick="setSetup('continuation')">Continuation</button><button class="s-btn" id="btn-rev" onclick="setSetup('reversal')">Reversal</button></div>
-            <div class="field-group"><label>Directional Bias</label><input type="text" id="biasInput" class="os-input" placeholder="HTF context..."></div>
+            <div class="field-group"><label>Daily Directional Bias</label><input type="text" id="biasInput" class="os-input"></div>
             <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Checked <b>Premarket PA</b></div></div>
-            <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Found <b>1H / 4H FVG</b></div></div>
+            <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Found most recent <b>1H / 4H FVG</b></div></div>
           </div>
-          <!-- S2 -->
           <div class="os-panel">
             <div class="os-p-head"><span class="os-seq">S2</span> Scale to 5m / 15m</div>
-            <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Marked <b>5m / 15m Gap</b><span class="os-note" id="s2-note">Select setup type.</span></div></div>
-            <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Confirmed <b>Manipulation</b></div></div>
+            <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Marked the <b>5m / 15m Gap</b><span class="os-note" id="s2-note">Select setup type.</span></div></div>
+            <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Confirmed <b>Manipulation</b><span class="os-note">Price sweep of liquidity into gap.</span></div></div>
           </div>
-          <!-- S3 -->
           <div class="os-panel">
             <div class="os-p-head"><span class="os-seq">S3</span> Inversion Hierarchy</div>
-            <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Found <b>Inversion</b> on 1-5m<span class="os-note">1m preferred. 30-sec only if displacement extreme.</span></div></div>
+            <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Found <b>Inversion</b> on 1m-5m<span class="os-note">1m preferred. 30-sec only if extreme displacement and no LTF gaps.</span></div></div>
             <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">It's the <b>Highest-TF Gap</b> in leg</div></div>
           </div>
-          <!-- S4 -->
           <div class="os-panel">
-            <div class="os-p-head"><span class="os-seq">S4</span> Risk & Survival</div>
-            <div style="display:flex;"><input type="number" id="maxDD" class="os-input" placeholder="DD Limit" oninput="calcBuffer()"><input type="number" id="riskAmt" class="os-input" placeholder="Risk/Trade" oninput="calcBuffer()"></div>
-            <div id="bufferDisplay" style="padding:15px; font-family:var(--mono); font-size:11px;">Survivability math required...</div>
-            <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Positive <b>R:R Ratio</b></div></div>
+            <div class="os-p-head"><span class="os-seq">S4</span> Risk & Math</div>
+            <div style="display:flex; border-bottom:1px solid var(--panel-alt);"><input type="number" id="maxDD" class="os-input" placeholder="DD Limit $" oninput="calcBuffer()"><input type="number" id="riskAmt" class="os-input" placeholder="Risk/Trade $" oninput="calcBuffer()"></div>
+            <div id="bufferDisplay" style="padding:15px; font-family:var(--mono); font-size:11px; background:var(--panel-alt);">Survival math required...</div>
+            <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Positive <b>R:R Ratio</b> confirmed</div></div>
             <div class="os-check"><input type="checkbox" class="os-step"><div class="os-c-text">Inversion <b>≤ 3 candles</b></div></div>
           </div>
-
-          <!-- THE VITAL GATE -->
+          
           <div class="os-panel os-gate" id="os-gate">
             <div class="os-scan-line"></div>
             <div class="os-p-head"><span class="os-seq" style="background:var(--amber);">GATE</span> Final Go / No-Go Validation</div>
@@ -344,57 +447,52 @@
           <div id="os-exec-alert">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
           <div id="journal-capture-zone">
             <div class="os-grid">
-              <div class="os-panel" style="grid-column: 1/-1;"><div class="os-p-head">Performance Data</div>
-                <div style="display:flex; gap:15px; padding:20px;"><input type="number" id="balBefore" class="os-input" placeholder="Before" oninput="calcPnL()"><input type="number" id="balAfter" class="os-input" placeholder="After" oninput="calcPnL()"></div>
+              <div class="os-panel" style="grid-column: 1 / -1;"><div class="os-p-head">Daily Performance Data</div>
+                <div style="display:flex; gap:20px; padding:25px;"><input type="number" id="balBefore" class="os-input" placeholder="Before" oninput="calcPnL()"><input type="number" id="balAfter" class="os-input" placeholder="After" oninput="calcPnL()"></div>
                 <div id="pnlResult" class="os-pnl-output">RESULT: $0.00</div>
               </div>
-              <!-- Technical -->
-              <div class="os-panel"><div class="os-p-head">Technical Narrative</div><textarea id="j-logic" rows="8" placeholder="Narrative..."></textarea></div>
-              <div class="os-panel"><div class="os-p-head">Psychological State</div><textarea id="j-psy" rows="8" placeholder="Emotions..."></textarea></div>
-              <!-- Performance Review -->
-              <div class="os-panel" style="grid-column: 1/-1;">
-                <div class="os-p-head">Final Performance Reflection</div>
-                <div class="field-group"><label>Morning Routine / Wake Up Time</label><input type="text" id="j-routine" class="os-input"></div>
-                <div class="grid-os">
-                  <div class="field-group"><label>Rules Broken (if any)</label><textarea id="j-broken" rows="4"></textarea></div>
-                  <div class="field-group"><label>Improvements for Next Session</label><textarea id="j-better" rows="4"></textarea></div>
+              <div class="os-panel"><div class="os-p-head">Technical Narrative</div><textarea id="j-logic" rows="10"></textarea></div>
+              <div class="os-panel"><div class="os-p-head">Psychological State</div><textarea id="j-psy" rows="10"></textarea></div>
+              <div class="os-panel" style="grid-column: 1 / -1;">
+                <div class="os-p-head">Final Review Reflection</div>
+                <div class="field-group"><label>Morning Routine / Wake Time</label><input type="text" id="j-wake" class="os-input"></div>
+                <div class="os-grid">
+                   <div class="field-group"><label>Rules Broken (Why?)</label><textarea id="j-rules" rows="4"></textarea></div>
+                   <div class="field-group"><label>Future Improvements</label><textarea id="j-better" rows="4"></textarea></div>
                 </div>
               </div>
-              <!-- Visual -->
-              <div class="os-panel" style="grid-column: 1 / -1;"><div class="os-p-head">Trade Screenshot</div>
-                <div class="os-screenshot" onclick="document.getElementById('file-input').click()"><img id="preview-img"><span>Tap to Upload Snapshot</span><input type="file" id="file-input" style="display:none;" onchange="handlePreview(this)"></div>
+              <div class="os-panel" style="grid-column: 1 / -1;"><div class="os-p-head">Visual Record</div>
+                <div class="os-screenshot" onclick="document.getElementById('file-input').click()"><img id="preview-img"><span>Tap to Upload Screenshot</span><input type="file" id="file-input" style="display:none;" onchange="handlePreview(this)"></div>
               </div>
             </div>
           </div>
-          <div style="display:flex; gap:15px; margin-top:40px;"><button class="btn-auth" style="background:var(--green); border:none; color:#000;" onclick="commitInternalLog()">Commit to Database</button><button class="btn-auth" style="background:var(--ink); color:#fff;" onclick="downloadManualPNG()">Export PNG</button></div>
+          <div style="display:flex; gap:15px; margin-top:40px;"><button class="btn-action-panel" style="background:var(--green); color:#000; border:none;" onclick="commitInternalLog()">Commit to Database</button><button class="btn-action-panel" style="background:var(--ink); color:#fff;" onclick="downloadManualPNG()">Export PNG</button></div>
         </div>
       </section>
 
-      <!-- PIPELINE -->
+      <!-- VANGUARD PIPELINE -->
       <section id="pipeline" class="section">
-        <h3>Pipeline</h3>
+        <h3>Vanguard Pipeline</h3>
         <div class="pipeline-wrapper"><div class="pipeline-spine"></div><div class="pipeline-progress"></div>
-          <div class="pipe-step active"><div class="pipe-indicator"></div><div class="pipe-card"><h4>M_01 Basics</h4><p>Order flow delivery logic.</p></div></div>
-          <div class="pipe-step active"><div class="pipe-indicator"></div><div class="pipe-card"><h4>M_02 FVG</h4><p>Inefficiency identification.</p></div></div>
+          <div class="pipe-step active"><div class="pipe-indicator"></div><div class="pipe-card"><h4>M_01 Candlesticks & Context</h4><p class="pipe-desc">Decoding institutional flow logic.</p></div></div>
+          <div class="pipe-step active"><div class="pipe-indicator"></div><div class="pipe-card"><h4>M_02 FVG Protocol</h4><p class="pipe-desc">Identifying high-intent gaps.</p></div></div>
         </div>
       </section>
 
       <!-- JOURNAL -->
-      <section id="journal" class="section"><h3>Archive</h3><div id="gallery-container"></div></section>
+      <section id="journal" class="section"><h3>Archive Hub</h3><div id="gallery-container"></div></section>
 
       <!-- ADMIN -->
-      <section id="admin" class="section">
-        <h3>System Override</h3>
-        <div class="admin-grid"><div class="admin-box"><h5>Mentees</h5><p id="stat-users">0</p></div></div>
-        <div class="card" style="border-color:var(--red);"><table class="user-table"><thead><tr><th>User</th><th>Status</th><th>Override</th></tr></thead><tbody id="user-body"></tbody></table></div>
+      <section id="admin" class="section"><h3>System Override</h3>
+        <div class="admin-grid"><div class="admin-stat"><h5>Authorized Ops</h5><p id="stat-users">0</p></div></div>
+        <div class="user-table-wrap"><table class="user-table"><thead><tr><th>User</th><th>Status</th><th>Override</th></tr></thead><tbody id="user-body"></tbody></table></div>
       </section>
-
     </main>
   </div>
 
   <script>
     let db;
-    const dbReq = indexedDB.open("FeX_Full_Mobile_DB_V23", 15);
+    const dbReq = indexedDB.open("FeX_Absolute_DB_V24", 18);
     dbReq.onupgradeneeded = e => {
       db = e.target.result;
       if (!db.objectStoreNames.contains("logs")) db.createObjectStore("logs", { keyPath: "id" });
@@ -403,19 +501,19 @@
     dbReq.onsuccess = e => { db = e.target.result; checkSavedSession(); };
 
     function toggleAuthView(v) { document.getElementById('signup-view').style.display = (v === 'signup') ? 'block' : 'none'; document.getElementById('login-view').style.display = (v === 'login') ? 'block' : 'none'; }
-    function handleSignUp() { const u = document.getElementById('reg-user').value.trim(), p = document.getElementById('reg-pass').value; if (!u || !p) return; const tx = db.transaction("users", "readwrite"); tx.objectStore("users").add({ username: u, password: p, status: 'pending' }); tx.oncomplete = () => { alert("Registration sent."); toggleAuthView('login'); }; }
+    function handleSignUp() { const u = document.getElementById('reg-user').value.trim(), p = document.getElementById('reg-pass').value; if (!u || !p) return; const tx = db.transaction("users", "readwrite"); tx.objectStore("users").add({ username: u, password: p, status: 'pending' }); tx.oncomplete = () => { alert("Transmission sent."); toggleAuthView('login'); }; }
     function handleLogin() {
       const u = document.getElementById('login-user').value.trim(), p = document.getElementById('login-pass').value, r = document.getElementById('remember-me').checked;
-      if (u === "FeXecutioner" && p === "Ramdhani@23") { if(r) localStorage.setItem('fex_v23_p', JSON.stringify({u, p, a:true})); return unlockPortal("MASTER_ADMIN", true); }
+      if (u === "FeXecutioner" && p === "Ramdhani@23") { if(r) localStorage.setItem('fex_v24_p', JSON.stringify({u, p, a:true})); return unlockPortal("MASTER_ADMIN", true); }
       db.transaction("users","readonly").objectStore("users").get(u).onsuccess = e => {
-        const user = e.target.result; if (user && user.password === p) { if (user.status === 'approved') { if(r) localStorage.setItem('fex_v23_p', JSON.stringify({u, p, a:false})); unlockPortal(u, false); } else alert("PENDING."); } else alert("INVALID.");
+        const user = e.target.result; if (user && user.password === p) { if (user.status === 'approved') { if(r) localStorage.setItem('fex_v24_p', JSON.stringify({u, p, a:false})); unlockPortal(u, false); } else alert("PENDING."); } else alert("INVALID.");
       };
     }
-    function checkSavedSession() { const s = localStorage.getItem('fex_v23_p'); if (s) { const d = JSON.parse(s); unlockPortal(d.u === "FeXecutioner" ? "MASTER_ADMIN" : d.u, d.a); } }
+    function checkSavedSession() { const s = localStorage.getItem('fex_v24_p'); if (s) { const d = JSON.parse(s); unlockPortal(d.u === "FeXecutioner" ? "MASTER_ADMIN" : d.u, d.a); } }
     function unlockPortal(name, admin) { document.getElementById('auth-gate').style.display = 'none'; document.getElementById('main-app').classList.add('active'); document.getElementById('op-name').innerText = name.toUpperCase(); document.getElementById('dash-user').innerText = name.toUpperCase(); document.getElementById('m-op-display').innerText = name.toUpperCase(); if (admin) document.getElementById('admin-nav').style.display = 'flex'; }
-    function handleLogout() { localStorage.removeItem('fex_v23_p'); location.reload(); }
+    function handleLogout() { localStorage.removeItem('fex_v24_p'); location.reload(); }
 
-    function navTo(id, el) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-link, .m-nav-item').forEach(l => l.classList.remove('active')); el.classList.add('active'); if (id === 'admin') renderAdminSuite(); if (id === 'journal') loadVisualHistory(); document.querySelector('.viewport').scrollTop = 0; }
+    function navTo(id, el) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-link, .m-nav-item').forEach(l => l.classList.remove('active')); el.classList.add('active'); if (id === 'admin') renderAdmin(); if (id === 'journal') loadVisualHistory(); document.querySelector('.viewport').scrollTop = 0; }
 
     function setSetup(t) {
       document.body.setAttribute('data-setup', t);
@@ -443,7 +541,8 @@
       const now = new Date(); document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
       const nyM = (new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"})).getHours()*60) + new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"})).getMinutes();
       const inW = nyM >= (9*60+30) && nyM <= 11*60;
-      const tag = document.getElementById('session-status'); tag.innerText = inW ? "IN WINDOW" : "OUTSIDE WINDOW"; tag.className = "os-tag " + (inW ? "os-tag-in" : "os-tag-out");
+      document.getElementById('session-status').innerText = inW ? "IN WINDOW" : "OUTSIDE WINDOW";
+      document.getElementById('session-status').className = "os-tag " + (inW ? "os-tag-in" : "os-tag-out");
     }
     setInterval(tick, 1000); tick();
 
@@ -451,47 +550,30 @@
 
     async function commitInternalLog() {
       document.getElementById('status-overlay').style.display = 'flex';
-      const areas = [document.getElementById('j-logic'), document.getElementById('j-psy'), document.getElementById('j-broken'), document.getElementById('j-better')];
+      const areas = [document.getElementById('j-logic'), document.getElementById('j-psy'), document.getElementById('j-rules'), document.getElementById('j-better')];
       const oldH = areas.map(a => a.style.height);
-      areas.forEach(a => a.style.height = a.scrollHeight + "px");
+      areas.forEach(a => a.style.height = a.scrollHeight + "px"); // EXPAND BOXES
 
-      const canvas = await html2canvas(document.getElementById('journal-capture-zone'), { backgroundColor: "#D1D4DC", scale: 1.5, useCORS: true });
+      const canvas = await html2canvas(document.getElementById('journal-capture-zone'), { backgroundColor: "#D1D4DC", scale: 2, useCORS: true });
       
-      areas.forEach((a, idx) => a.style.height = oldH[idx]);
-      const entry = { id: Date.now(), ts: new Date().toLocaleString(), img: canvas.toDataURL("image/jpeg", 0.8), text: { logic: areas[0].value, psy: areas[1].value, broken: areas[2].value, better: areas[3].value } };
+      areas.forEach((a, idx) => a.style.height = oldH[idx]); // RESTORE
       const tx = db.transaction("logs", "readwrite");
-      tx.objectStore("logs").add(entry);
-      tx.oncomplete = () => { document.getElementById('status-overlay').style.display='none'; alert("RECORD SYNCED."); };
+      tx.objectStore("logs").add({ id: Date.now(), ts: new Date().toLocaleString(), img: canvas.toDataURL("image/jpeg", 0.8) });
+      tx.oncomplete = () => { document.getElementById('status-overlay').style.display='none'; alert("VISUAL FILE SYNCED."); };
     }
 
     function loadVisualHistory() {
       const g = document.getElementById('gallery-container');
       db.transaction("logs", "readonly").objectStore("logs").getAll().onsuccess = e => {
         const logs = e.target.result.sort((a,b) => b.id - a.id);
-        g.innerHTML = logs.map(l => `<div class="history-card"><div class="h-meta"><span>${l.ts}</span><div><button class="dossier-btn" onclick="openReport(${l.id})">Tactical View</button><button onclick="delL(${l.id})" style="color:var(--red); background:none; border:none; margin-left:10px;">[X]</button></div></div><img src="${l.img}" class="h-img-wrap"></div>`).join('');
+        g.innerHTML = logs.map(l => `<div class="history-card" onclick="openL('${l.img}')"><div class="h-meta"><span>RECORD: ${l.ts}</span><button onclick="delL(${l.id}, event)" style="color:var(--red); background:none; border:none; font-size:9px;">[X]</button></div><img src="${l.img}" class="h-img-wrap"></div>`).join('');
       };
     }
-
-    function openReport(id) {
-      db.transaction("logs","readonly").objectStore("logs").get(id).onsuccess = e => {
-        const l = e.target.result;
-        document.getElementById('lb-img').src = l.img;
-        document.getElementById('lb-text').innerHTML = `<h3>TECHNICAL DOSSIER</h3><p><b>NARRATIVE:</b> ${l.text.logic}</p><p><b>PSYCH:</b> ${l.text.psy}</p><p><b>MISTAKES:</b> ${l.text.broken}</p><p><b>PLAN:</b> ${l.text.better}</p>`;
-        document.getElementById('lightbox').style.display = 'block';
-      };
-    }
-
-    function delL(id) { if(confirm("Purge?")) { db.transaction("logs","readwrite").objectStore("logs").delete(id).onsuccess = loadVisualHistory; } }
-    function downloadManualPNG() { html2canvas(document.getElementById('journal-capture-zone'), { backgroundColor: "#D1D4DC", scale: 2 }).then(c => { const link = document.createElement('a'); link.download = `Executioner_${Date.now()}.png`; link.href = c.toDataURL(); link.click(); }); }
-
-    function renderAdminSuite() {
-      const body = document.getElementById('user-body');
-      db.transaction("users", "readonly").objectStore("users").getAll().onsuccess = e => {
-        document.getElementById('stat-users').innerText = e.target.result.length;
-        body.innerHTML = e.target.result.map(u => `<tr><td>${u.username}</td><td>${u.status.toUpperCase()}</td><td><button onclick="updU('${u.username}','approved')">[OK]</button> <button onclick="updU('${u.username}','pending')">[REV]</button></td></tr>`).join('');
-      };
-    }
-    function updU(un, s) { const tx = db.transaction("users","readwrite"); const st = tx.objectStore("users"); st.get(un).onsuccess = e => { const u = e.target.result; u.status = s; st.put(u).onsuccess = renderAdminSuite; }; }
+    function delL(id, e) { e.stopPropagation(); if(confirm("Purge?")) { db.transaction("logs","readwrite").objectStore("logs").delete(id).onsuccess = loadVisualHistory; } }
+    function openL(s) { document.getElementById('lb-img').src = s; document.getElementById('lightbox').style.display = 'block'; }
+    function downloadManualPNG() { html2canvas(document.getElementById('journal-capture-zone'), { backgroundColor: "#D1D4DC", scale: 2 }).then(c => { const link = document.createElement('a'); link.download = `FeX_${Date.now()}.png`; link.href = c.toDataURL(); link.click(); }); }
+    function renderAdmin() { db.transaction("users","readonly").objectStore("users").getAll().onsuccess = e => { document.getElementById('stat-users').innerText = e.target.result.length; document.getElementById('user-body').innerHTML = e.target.result.map(u => `<tr><td>${u.username}</td><td>${u.status.toUpperCase()}</td><td><button onclick="updU('${u.username}','approved')">[OK]</button> <button onclick="updU('${u.username}','pending')">[REV]</button></td></tr>`).join(''); }; }
+    function updU(un, s) { const tx = db.transaction("users","readwrite"); const st = tx.objectStore("users"); st.get(un).onsuccess = e => { const u = e.target.result; u.status = s; st.put(u).onsuccess = renderAdmin; }; }
   </script>
 </body>
 </html>
