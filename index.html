@@ -9,563 +9,540 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- High-res capture engine -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
   :root {
-    --bg: #D1D4DC;        /* Institutional Canvas */
-    --ink: #050505;       /* Pure Black */
-    --panel: #FFFFFF;     /* Upclose White */
-    --panel-alt: #e9ebf0;
-    --line: #787B86;      /* Downclose Slate */
-    --turquoise: #00CED1; /* Continuation Highlight */
+    /* Institutional Chart Palette */
+    --bg: #D1D4DC;        /* Primary Canvas */
+    --panel: #FFFFFF;     /* Upclose Candle */
+    --panel-alt: #e9ebf0; /* Muted Background */
+    --line: #787B86;      /* Downclose Candle / Slate */
+    --ink: #050505;       /* Deep Text */
+    --ink-dim: #34363b;
+    --ink-faint: #686b72;
+    --turquoise: #00CED1; /* Executioner Highlight */
     --turquoise-glow: rgba(0, 206, 209, 0.4);
-    --red: #FF4D4D;
     --green: #27D38C;
     --amber: #E9A23B;
+    --red: #E8554E;
+    
     --mono: 'JetBrains Mono', monospace;
     --disp: 'Chakra Petch', sans-serif;
     --body: 'Inter', sans-serif;
+    
+    --current-accent: var(--turquoise);
+    --current-glow: var(--turquoise-glow);
   }
 
-  * { box-sizing: border-box; outline: none; }
+  * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+  
+  /* Scrollbar Customization */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--ink); }
-  ::-webkit-scrollbar-thumb { background: var(--turquoise); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--current-accent); border-radius: 10px; }
 
   body {
     background: var(--bg);
     color: var(--ink);
     font-family: var(--body);
     margin: 0;
-    padding: 0;
+    padding: 20px 15px 120px;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
 
-  /* --- APP SHELL --- */
-  .app-container { display: flex; min-height: 100vh; }
-  
-  .sidebar {
-    width: 280px;
-    background: var(--ink);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    padding: 40px 0;
-    position: fixed;
-    height: 100vh;
-    z-index: 100;
-    border-right: 1px solid var(--line);
+  .wrap { max-width: 1100px; margin: 0 auto; position: relative; }
+
+  /* Navigation Tabs */
+  .mode-nav { 
+    display: flex; 
+    gap: 2px; 
+    background: var(--line); 
+    padding: 2px; 
+    border-radius: 6px; 
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   }
-
-  .side-header { padding: 0 30px; margin-bottom: 50px; }
-  .side-header h1 { font-family: var(--disp); font-size: 24px; margin: 0; letter-spacing: 2px; }
-  .side-header span { font-family: var(--mono); font-size: 10px; color: var(--line); text-transform: uppercase; }
-
-  .nav-menu { flex-grow: 1; }
-  .nav-item {
-    padding: 18px 30px;
-    font-family: var(--mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    color: var(--line);
-    cursor: pointer;
+  .nav-btn { 
+    flex: 1; 
+    background: var(--bg); 
+    border: none; 
+    padding: 16px; 
+    font-family: var(--mono); 
+    font-weight: 700; 
+    cursor: pointer; 
+    text-transform: uppercase; 
+    font-size: 11px; 
     transition: 0.3s;
-    border-left: 4px solid transparent;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .nav-item:hover, .nav-item.active { background: #111; color: var(--turquoise); border-left-color: var(--turquoise); }
-
-  .main-viewport {
-    flex-grow: 1;
-    margin-left: 280px;
-    padding: 40px;
-    position: relative;
-  }
-
-  /* --- TELEMETRY --- */
-  .telemetry {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    border-bottom: 2px solid var(--ink);
-    padding-bottom: 15px;
-    margin-bottom: 30px;
-  }
-  .clock { font-size: 42px; font-weight: 700; font-family: var(--mono); line-height: 1; }
-  .session-pill {
-    padding: 6px 12px;
     border-radius: 4px;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
+    color: var(--ink-faint);
   }
-  .pill-out { background: var(--line); color: white; }
-  .pill-in { background: var(--panel); color: var(--ink); border: 1px solid var(--ink); box-shadow: 0 0 15px white; }
+  .nav-btn.active { background: var(--ink); color: var(--panel); }
 
-  /* --- MASTER STATUS --- */
-  .master-status {
-    background: var(--panel);
-    border: 1px solid var(--ink);
-    padding: 30px;
-    margin-bottom: 30px;
+  /* Telemetry / Clock Header */
+  .head { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-end; 
+    border-bottom: 2px solid var(--ink); 
+    padding-bottom: 15px; 
+    margin-bottom: 25px;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .brand h1 { font-family: var(--disp); font-size: clamp(24px, 5vw, 36px); margin: 0; text-transform: uppercase; line-height: 1; letter-spacing: 1px; }
+  
+  .telemetry { text-align: right; font-family: var(--mono); }
+  .clock { font-size: clamp(28px, 6vw, 42px); font-weight: 700; line-height: 1; letter-spacing: -1px; }
+  
+  .session-tag { 
+    font-size: 12px; text-transform: uppercase; font-weight: 800; margin-top: 10px; 
+    padding: 6px 12px; border-radius: 3px; display: inline-block; letter-spacing: 1px;
+    transition: 0.3s;
+  }
+  .tag-out { background: var(--line); color: #FFFFFF; }
+  .tag-in { background: #FFFFFF; color: var(--ink); border: 1px solid var(--ink); box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+
+  #local-range { font-size: 12px; font-weight: 700; margin-top: 8px; font-family: var(--mono); color: var(--ink-dim); }
+
+  /* Master Console Display */
+  .master {
+    position: relative; 
+    border: 1px solid var(--ink); 
+    background: var(--panel); 
+    padding: clamp(20px, 5vw, 35px); 
+    margin-bottom: 30px; 
     box-shadow: 8px 8px 0 var(--line);
-    position: relative;
+    border-left: 12px solid var(--current-accent);
+    transition: border-color 0.3s;
   }
-  .m-title { font-family: var(--disp); font-size: 64px; font-weight: 800; line-height: 1; }
-  .m-msg { font-family: var(--mono); font-size: 13px; color: var(--ink-dim); margin-top: 10px; }
+  .m-status { font-family: var(--disp); font-size: clamp(48px, 10vw, 72px); font-weight: 800; line-height: 1; text-transform: uppercase; }
+  #mmsg { font-family: var(--mono); font-size: 13px; color: var(--line); margin-top: 8px; font-weight: 500; }
 
-  /* --- GRID SYSTEM --- */
+  /* Grid Layout Engine */
   .page { display: none; }
   .page.active { display: block; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
 
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    overflow: hidden;
+  .panel { 
+    border: 1px solid var(--line); 
+    background: var(--panel); 
+    border-radius: 4px; 
+    overflow: hidden; 
+    box-shadow: 4px 4px 0 var(--panel-alt);
     height: fit-content;
   }
-  .p-head {
-    background: var(--panel-alt);
-    padding: 12px 20px;
+  .p-head { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    padding: 15px 20px; 
+    background: var(--panel-alt); 
     border-bottom: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    gap: 12px;
     font-family: var(--disp);
     font-weight: 700;
+    font-size: 15px;
     text-transform: uppercase;
-    font-size: 14px;
   }
-  .seq { background: var(--ink); color: white; padding: 2px 8px; border-radius: 2px; font-family: var(--mono); font-size: 10px; }
+  .seq { background: var(--ink); color: var(--panel); font-family: var(--mono); font-size: 11px; padding: 3px 8px; border-radius: 2px; }
 
-  .check {
-    display: flex;
-    gap: 15px;
-    padding: 15px 20px;
-    cursor: pointer;
+  /* Setup State Toggles */
+  .setup-toggle { display: flex; gap: 4px; padding: 12px; background: var(--panel-alt); border-bottom: 1px solid var(--line); }
+  .s-btn { 
+    flex: 1; padding: 12px; font-family: var(--mono); font-size: 11px; font-weight: 700; 
+    border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; 
+    background: #fff; transition: 0.3s; color: var(--line);
+  }
+  .s-btn.active[onclick*="continuation"] { 
+    background: var(--ink); color: var(--turquoise); border-color: var(--turquoise); 
+    box-shadow: 0 0 15px var(--turquoise-glow); 
+  }
+  .s-btn.active[onclick*="reversal"] { 
+    background: var(--ink); color: var(--amber); border-color: var(--amber); 
+    box-shadow: 0 0 15px var(--amber-glow); 
+  }
+
+  /* Checklist Items */
+  .check { 
+    display: flex; 
+    gap: 15px; 
+    padding: 18px 20px; 
+    cursor: pointer; 
+    align-items: flex-start; 
+    transition: 0.15s;
     border-bottom: 1px solid var(--panel-alt);
-    transition: 0.2s;
-    align-items: flex-start;
   }
+  .check:last-child { border-bottom: none; }
   .check:hover { background: var(--panel-alt); }
-  .check input { width: 22px; height: 22px; accent-color: var(--ink); margin-top: 2px; }
-  .c-text { font-size: 14px; line-height: 1.4; font-weight: 500; }
-  .note { display: block; font-size: 11px; color: var(--line); font-family: var(--mono); margin-top: 4px; }
+  .check input { width: 24px; height: 24px; accent-color: var(--ink); cursor: pointer; flex-shrink: 0; }
+  .c-text { font-size: 15px; line-height: 1.5; font-weight: 500; color: var(--ink-dim); }
+  .c-text b { font-weight: 700; color: var(--ink); }
+  .note { display: block; font-size: 11px; color: var(--line); font-family: var(--mono); margin-top: 6px; }
 
-  /* --- FORMS --- */
+  /* Logic Accents */
+  .note-continuation { color: var(--green); display: none; }
+  .note-reversal { color: var(--amber); display: none; }
+  body[data-setup="continuation"] .note-continuation { display: block; }
+  body[data-setup="reversal"] .note-reversal { display: block; }
+
+  /* Inputs & Buffer */
   .field-group { padding: 20px; border-bottom: 1px solid var(--panel-alt); }
-  label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; color: var(--line); }
-  textarea, input[type="text"], input[type="number"] {
-    width: 100%;
-    border: 1px solid var(--line);
-    background: var(--panel-alt);
-    padding: 15px;
-    font-family: var(--body);
-    font-size: 14px;
-    border-radius: 2px;
-    color: var(--ink);
-  }
-  textarea:focus, input:focus { background: #fff; border-color: var(--ink); }
-
-  /* --- EXECUTION STATE --- */
-  #bottom-flow { display: none; margin-top: 40px; border-top: 4px solid var(--ink); padding-top: 40px; }
+  label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--line); margin-bottom: 8px; letter-spacing: 1px; }
   
-  .exec-alert {
-    background: var(--ink);
-    color: white;
-    padding: 25px;
-    text-align: center;
-    font-family: var(--mono);
-    font-weight: 700;
-    letter-spacing: 4px;
-    font-size: 18px;
-    margin-bottom: 30px;
-    animation: blink 1.2s infinite;
+  textarea, .os-input { 
+    width: 100%; 
+    border: 1px solid var(--line); 
+    background: var(--panel-alt); 
+    padding: 15px; 
+    font-family: var(--body); 
+    font-size: 14px; 
+    border-radius: 4px; 
+    color: var(--ink);
+    transition: 0.2s;
+  }
+  textarea:focus, .os-input:focus { background: #fff; border-color: var(--current-accent); }
+  
+  .buffer-row { 
+    background: var(--panel-alt); 
+    padding: 20px; 
+    font-family: var(--mono); 
+    font-size: 12px; 
+    line-height: 1.6; 
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-dim);
+  }
+  .buffer-row b { color: var(--red); font-weight: 700; }
+
+  /* Gate Logic HUD */
+  .gate { position: relative; border: 2px solid var(--line); transition: 0.6s; grid-column: 1 / -1; }
+  .gate.armed { border-color: var(--current-accent); box-shadow: 0 0 30px var(--current-glow); }
+  .scan-line {
+    position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, var(--current-glow), transparent);
+    pointer-events: none;
+  }
+  .gate.armed .scan-line { animation: scan-anim 3s linear infinite; }
+  @keyframes scan-anim { from { left: -100%; } to { left: 100%; } }
+
+  /* GO FLOW DYNAMICS */
+  #bottom-flow { display: none; margin-top: 60px; border-top: 4px solid var(--ink); padding-top: 60px; }
+  
+  #exec-alert {
+    background: var(--ink); color: #fff; padding: 30px; 
+    text-align: center; font-family: var(--mono); font-weight: 700; margin-bottom: 35px;
+    animation: blink 1.2s infinite; letter-spacing: 6px; font-size: 20px;
+    border-radius: 4px; border: 1px solid var(--current-accent);
   }
   @keyframes blink { 50% { opacity: 0.3; } }
 
-  .pnl-output { padding: 30px; text-align: center; font-family: var(--disp); font-size: 42px; font-weight: 800; border: 2px solid var(--line); margin-top: 20px; }
-  .gain { background: #fff; color: var(--green); border-color: var(--green); }
-  .loss { background: var(--line); color: #fff; border-color: var(--ink); }
+  #journal-area { padding: clamp(10px, 4vw, 30px); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
 
+  /* Financial Summary */
+  .pnl-output { 
+    padding: 40px; text-align: center; font-family: var(--disp); font-size: clamp(32px, 8vw, 48px); 
+    font-weight: 800; margin-top: 20px; border: 2px solid var(--line); border-radius: 4px; 
+    transition: 0.5s; 
+  }
+  .pnl-gain { background: #fff; color: var(--green); border-color: var(--green); box-shadow: 0 0 30px rgba(39, 211, 140, 0.3); }
+  .pnl-loss { background: var(--line); color: #fff; border-color: var(--ink); }
+
+  /* Screenshot Upload */
   .screenshot-zone {
-    border: 2px dashed var(--line);
-    background: var(--panel-alt);
-    height: 350px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    margin: 15px;
-    position: relative;
-    overflow: hidden;
+    border: 2px dashed var(--line); background: var(--panel-alt); min-height: 350px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; margin: 15px; border-radius: 4px; overflow: hidden;
   }
-  .screenshot-zone img { width: 100%; height: 100%; object-fit: contain; position: absolute; }
+  .screenshot-zone img { width: 100%; height: 100%; object-fit: contain; position: absolute; display: none; }
+  .screenshot-zone span { font-family: var(--mono); font-size: 12px; color: var(--line); text-transform: uppercase; letter-spacing: 2px; }
 
-  /* --- GATE SCANNING --- */
-  .gate { position: relative; border: 2px solid var(--line); }
-  .gate.armed { border-color: var(--turquoise); box-shadow: 0 0 25px var(--turquoise-glow); }
-  .scan-line {
-    position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 206, 209, 0.1), transparent);
-    pointer-events: none;
+  /* Action Buttons */
+  .footer-actions { display: flex; gap: 15px; margin-top: 50px; flex-wrap: wrap; }
+  .btn { 
+    flex: 1; min-width: 250px; padding: 22px; font-family: var(--mono); font-weight: 700; border-radius: 4px; 
+    cursor: pointer; text-transform: uppercase; border: 1px solid var(--ink); font-size: 13px; transition: 0.3s;
   }
-  .gate.armed .scan-line { animation: scan 3s linear infinite; }
-  @keyframes scan { from { left: -100%; } to { left: 100%; } }
+  .btn-save { background: var(--ink); color: var(--panel); border: none; }
+  .btn-commit { background: var(--green); color: var(--ink); border-color: var(--ink); }
+  .btn-reset { background: transparent; color: var(--ink-faint); border-color: var(--line); }
+  .btn:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
 
-  /* --- INTERNAL GALLERY --- */
-  .gallery { display: grid; gap: 30px; }
-  .history-card {
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    overflow: hidden;
-    box-shadow: 10px 10px 0 var(--line);
+  /* Internal Archive Gallery */
+  #gallery-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
+  .history-card { border: 1px solid var(--line); background: #fff; border-radius: 4px; overflow: hidden; box-shadow: 8px 8px 0 var(--line); cursor: zoom-in; transition: 0.3s; }
+  .history-card:hover { transform: scale(1.02); }
+  .h-meta { padding: 15px 20px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
+  .h-img-preview { width: 100%; max-height: 450px; object-fit: cover; display: block; filter: brightness(0.95); }
+
+  /* Tactical Lightbox (Expanding File View) */
+  #lightbox { 
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
+    z-index: 10001; padding: clamp(10px, 5vw, 60px); overflow-y: auto; text-align: center; 
   }
-  .h-meta {
-    padding: 15px 20px;
-    background: var(--ink);
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--mono);
-    font-size: 11px;
-    align-items: center;
-  }
-  .h-preview { width: 100%; max-height: 400px; object-fit: cover; cursor: zoom-in; border-top: 1px solid #333; }
-  
-  .report-btn {
-    background: var(--turquoise);
-    color: var(--ink);
-    border: none;
-    padding: 8px 16px;
-    font-family: var(--mono);
-    font-weight: 700;
-    font-size: 10px;
-    cursor: pointer;
-    text-transform: uppercase;
+  #lightbox img { max-width: 100%; height: auto; border: 3px solid #fff; box-shadow: 0 0 80px rgba(0,0,0,0.8); }
+  .close-lb { 
+    position: fixed; top: 20px; right: 20px; color: #fff; background: var(--red); 
+    padding: 12px 25px; font-family: var(--mono); font-weight: 700; cursor: pointer; 
+    border-radius: 4px; z-index: 10002; text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   }
 
-  /* --- OVERLAYS --- */
-  #status-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.9);
-    z-index: 10000;
-    color: white;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--mono);
-    letter-spacing: 2px;
+  /* Capture Overlay */
+  #status-overlay { 
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
+    z-index: 10002; color: white; flex-direction: column; align-items: center; 
+    justify-content: center; font-family: var(--mono); letter-spacing: 3px; text-align: center; 
   }
 
-  #lightbox {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.98);
-    z-index: 10001;
-    padding: 40px;
-    overflow-y: auto;
+  @media (max-width: 768px) {
+    .head { flex-direction: column; align-items: flex-start; }
+    .os-clock { margin-bottom: 5px; }
+    .os-grid { grid-template-columns: 1fr; }
+    .btn { width: 100%; }
+    .viewport { padding: 30px 15px; }
   }
-  .lb-content { max-width: 1000px; margin: 0 auto; text-align: center; }
-  .lb-img { max-width: 100%; border: 3px solid #fff; margin-bottom: 30px; }
-  
-  .dossier {
-    background: var(--bg);
-    color: var(--ink);
-    padding: 40px;
-    text-align: left;
-    font-family: var(--body);
-    border-radius: 4px;
-    margin-top: 20px;
-  }
-  .dossier h2 { font-family: var(--disp); border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
-  .d-section { margin-bottom: 25px; }
-  .d-label { font-family: var(--mono); font-weight: 800; font-size: 11px; color: var(--line); text-transform: uppercase; }
-  .d-value { font-size: 16px; margin-top: 5px; white-space: pre-wrap; line-height: 1.6; }
-
-  .close-btn {
-    position: fixed;
-    top: 30px;
-    right: 30px;
-    background: var(--red);
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-family: var(--mono);
-    font-weight: 700;
-    cursor: pointer;
-    z-index: 10002;
-  }
-
-  .btn-row { display: flex; gap: 15px; margin-top: 40px; }
-  .btn {
-    flex: 1;
-    padding: 20px;
-    font-family: var(--mono);
-    font-weight: 700;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 13px;
-    transition: 0.2s;
-  }
-  .btn-commit { background: var(--green); color: var(--ink); border: none; }
-  .btn-save { background: var(--ink); color: white; border: none; }
-  .btn-reset { background: transparent; border: 1px solid var(--line); color: var(--line); }
-  .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-
-  /* --- MOBILE FIXES --- */
-  @media (max-width: 1000px) {
-    .sidebar { width: 80px; padding: 20px 0; }
-    .side-header, .nav-text, .sidebar-footer { display: none; }
-    .nav-item { justify-content: center; padding: 25px 0; }
-    .main-viewport { margin-left: 80px; padding: 20px; }
-    .grid { grid-template-columns: 1fr; }
-    .m-title { font-size: 40px; }
-  }
-
 </style>
 </head>
-<body>
+<body data-setup="continuation">
 
   <div class="scanline"></div>
-
-  <!-- STATUS OVERLAY -->
+  <div id="lightbox" onclick="this.style.display='none'">
+    <span class="close-lb">CLOSE LOG [X]</span>
+    <img id="lb-img" src="">
+  </div>
+  
   <div id="status-overlay">
-    <div style="font-size: 28px; margin-bottom: 10px;">DEEP ARCHIVING IN PROGRESS</div>
-    <div id="status-msg">EXPANDING DATA NODES...</div>
+    <div style="font-size: 28px; margin-bottom: 25px; color: var(--current-accent);">DECRYPTING DATA...</div>
+    <div style="font-size: 12px; color: #fff; opacity: 0.6;">WRITING FULL-TEXT dossiers TO LOCAL PERMANENT DATABASE.</div>
   </div>
 
-  <!-- LIGHTBOX / REPORT VIEW -->
-  <div id="lightbox">
-    <button class="close-btn" onclick="closeReport()">TERMINAL CLOSE [X]</button>
-    <div class="lb-content">
-      <img id="lb-img" class="lb-img">
-      <div id="lb-dossier" class="dossier"></div>
-    </div>
-  </div>
+  <div class="wrap">
+    
+    <nav class="mode-nav">
+      <button class="nav-btn active" id="btn-exec" onclick="switchPage('exec')">Execution Mode</button>
+      <button class="nav-btn" id="btn-journal" onclick="switchPage('journal')">Internal Archive</button>
+    </nav>
 
-  <div class="app-container">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="side-header">
-        <h1>FEXECUTIONER</h1>
-        <span>Deployment Hub v22.0</span>
+    <header class="head">
+      <div class="brand">
+        <div style="font-family:var(--mono); font-size:10px; color:var(--line); letter-spacing:4px;">FEXECUTIONER</div>
+        <h1>CONSOLE</h1>
       </div>
-      <nav class="nav-menu">
-        <div class="nav-item active" onclick="switchPage('exec', this)">
-          <span class="nav-text">Operational Dash</span>
-        </div>
-        <div class="nav-item" onclick="switchPage('journal', this)">
-          <span class="nav-text">Internal Database</span>
-        </div>
-      </nav>
-      <div style="padding: 30px; font-family: var(--mono); font-size: 9px; color: var(--line);">
-        SYS_STATUS: ONLINE<br>
-        LOC: CAPE_TOWN.ZA
+      <div class="telemetry">
+        <div class="clock" id="clock">00:00:00</div>
+        <div id="session-status" class="session-tag tag-out">Checking Window...</div>
+        <div id="local-range" style="font-size:12px; font-family:var(--mono); margin-top:10px; font-weight:700;">LOCAL: --:--</div>
       </div>
-    </aside>
+    </header>
 
-    <!-- MAIN VIEWPORT -->
-    <main class="main-viewport">
-      
-      <!-- OPERATIONAL DASHBOARD -->
-      <section id="page-exec" class="page active">
-        <header class="telemetry">
-          <div class="brand">
-            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 4px; color: var(--line);">FE-XECUTIONER</div>
-            <div class="clock" id="clock">00:00:00</div>
-          </div>
-          <div style="text-align: right;">
-            <div id="session-tag" class="session-pill pill-out">Checking Window...</div>
-            <div id="local-range" style="font-family: var(--mono); font-size: 11px; margin-top: 8px;">LOCAL: Calculating...</div>
-          </div>
-        </header>
+    <section class="master" id="master">
+      <div class="m-status" id="mstatus">NO-GO</div>
+      <div id="mmsg" style="font-family:var(--mono); font-size:13px; color:var(--line); margin-top:8px;">Complete sections S1–S4 to arm the execution gate.</div>
+    </section>
 
-        <div class="master-status">
-          <div class="m-title" id="mstatus">NO-GO</div>
-          <div class="m-msg" id="mmsg">Complete Deployment Stages S1-S4 to arm the gate.</div>
+    <!-- PAGE 1: EXECUTION ENGINE -->
+    <main id="page-exec" class="page active">
+      <div class="grid">
+        
+        <!-- S1 -->
+        <div class="panel">
+          <div class="p-head"><span class="seq">S1</span> Bias & HTF Gap</div>
+          <div class="setup-toggle">
+            <button class="s-btn active" id="btn-cont" onclick="setSetup('continuation')">Continuation</button>
+            <button class="s-btn" id="btn-rev" onclick="setSetup('reversal')">Reversal</button>
+          </div>
+          <div class="field-group">
+            <label>Technical Directional Bias</label>
+            <input type="text" id="biasInput" class="os-input" placeholder="HTF context and reasoning...">
+          </div>
+          <div class="check"><input type="checkbox" class="step"><div class="c-text">Checked <b>Premarket PA</b><span class="note">Reviewed overnight highs/lows and premarket VWAP levels.</span></div></div>
+          <div class="check"><input type="checkbox" class="step"><div class="c-text">Found most recent <b>1H / 4H FVG</b><span class="note">The specific anchor price is reacting to.</span></div></div>
         </div>
 
-        <div class="grid">
-          <!-- S1 -->
-          <div class="panel">
-            <div class="p-head"><span class="seq">S1</span> Bias & HTF Context</div>
-            <div class="setup-toggle">
-              <div class="field-group">
-                <label>Institutional Bias</label>
-                <input type="text" id="biasInput" placeholder="HTF draw and technical reasoning...">
-              </div>
-            </div>
-            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Checked <b>Premarket PA</b><span class="note">Reviewed overnight highs/lows and VWAP.</span></div></label>
-            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Found most recent <b>1H / 4H FVG</b><span class="note">The anchor price is reacting to.</span></div></label>
-          </div>
-
-          <!-- S2 -->
-          <div class="panel">
-            <div class="p-head"><span class="seq">S2</span> Scale to 5m / 15m</div>
-            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Marked the <b>5m / 15m Gap</b><span class="note">The specific gap for the actual trade.</span></div></label>
-            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Confirmed <b>Manipulation</b><span class="note">Price sweep of liquidity into the gap.</span></div></label>
-          </div>
-
-          <!-- S3 -->
-          <div class="panel">
-            <div class="p-head"><span class="seq">S3</span> Inversion (1m–5m)</div>
-            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Found <b>Inversion</b> on 1-5 min chart<span class="note">1m preferred. 30s only if extreme displacement.</span></div></label>
-            <label class="check"><input type="checkbox" class="step"> <div class="c-text">It's the <b>Highest-TF Gap</b><span class="note">Primary gap made in the manipulation leg.</span></div></label>
-          </div>
-
-          <!-- S4 -->
-          <div class="panel">
-            <div class="p-head"><span class="seq">S4</span> Risk & Survivability</div>
-            <div class="grid" style="grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--panel-alt);">
-              <div class="field-group" style="border-right: 1px solid var(--panel-alt);"><label>Max Drawdown $</label><input type="number" id="maxDD" oninput="calcBuffer()"></div>
-              <div class="field-group"><label>Risk per Trade $</label><input type="number" id="riskAmt" oninput="calcBuffer()"></div>
-            </div>
-            <div id="bufferDisplay" style="padding: 15px; font-family: var(--mono); font-size: 11px; background: var(--panel-alt);">Survival math pending...</div>
-            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Positive <b>R:R Ratio</b> confirmed</div></label>
-            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Targeting <b>Clear Liquidity</b></div></label>
-            <label class="check"><input type="checkbox" class="step"> <div class="c-text">Inversion <b>≤ 3 candles</b></div></label>
-          </div>
-
-          <!-- THE GATE -->
-          <div class="panel gate" id="gate" style="grid-column: 1 / -1;">
-            <div class="scan-line"></div>
-            <div class="p-head"><span class="seq" style="background: var(--amber);">GATE</span> Final Go / No-Go Validation</div>
-            <label class="check"><input type="checkbox" class="gate-step" disabled> <div class="os-c-text">Inside <b>Session Window</b> (9:30–11:00 NY)?</div></label>
-            <label class="check"><input type="checkbox" class="gate-step" disabled> <div class="os-c-text">Inversion confirmed off <b>Highest-TF Gap</b>?</div></label>
-            <label class="check"><input type="checkbox" class="gate-step" disabled> <div class="os-c-text">This is the <b>Trade I Planned</b> (Not a chase)?</div></label>
-          </div>
+        <!-- S2 -->
+        <div class="panel">
+          <div class="p-head"><span class="seq">S2</span> Scale to 5m / 15m</div>
+          <div class="check"><input type="checkbox" class="step"><div class="c-text">Marked the <b>5m / 15m Gap</b>
+            <span class="note" id="s2-note">CONTINUATION: Use this gap to trade off of.</span>
+          </div></div>
+          <div class="check"><input type="checkbox" class="step"><div class="c-text">Confirmed <b>Manipulation</b><span class="note">Price ran into the gap and swept internal liquidity.</span></div></div>
         </div>
 
-        <!-- DYNAMIC BOTTOM FLOW -->
-        <div id="bottom-flow">
-          <div class="exec-alert">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
-          
-          <div id="journal-capture-zone">
-            <div class="grid">
-              <!-- Financials -->
-              <div class="panel" style="grid-column: 1 / -1;">
-                <div class="p-head"><span class="seq">FIN</span> Daily Performance</div>
-                <div style="display: flex; gap: 20px; padding: 20px;">
-                  <div style="flex: 1;"><label>Balance Before</label><input type="number" id="balBefore" oninput="calcPnL()"></div>
-                  <div style="flex: 1;"><label>Balance After</label><input type="number" id="balAfter" oninput="calcPnL()"></div>
-                </div>
-                <div id="pnlResult" class="pnl-output">RESULT: $0.00</div>
-              </div>
+        <!-- S3 -->
+        <div class="panel">
+          <div class="p-head"><span class="seq">S3</span> Inversion hierarchy</div>
+          <div class="check"><input type="checkbox" class="step"><div class="c-text">Found the <b>Inversion</b> on 1–5 min chart<span class="note">1m preferred. <b>30-sec only if extreme displacement</b> and no LTF gaps form.</span></div></div>
+          <div class="check"><input type="checkbox" class="step"><div class="c-text">It's the <b>Highest-TF Gap</b> in that leg<span class="note">Primary gap made during that specific manipulation leg.</span></div></div>
+        </div>
 
-              <!-- Technical & Psych -->
-              <div class="panel">
-                <div class="p-head">Technical Narrative</div>
-                <textarea id="j-logic" rows="8" placeholder="HTF logic, LTF keys, and targets..."></textarea>
-              </div>
-              <div class="panel">
-                <div class="p-head">Psychological State</div>
-                <textarea id="j-psy" rows="8" placeholder="Routine, feelings pre/during/after, and discipline..."></textarea>
-              </div>
+        <!-- S4 -->
+        <div class="panel">
+          <div class="p-head"><span class="seq">S4</span> Risk & Survival</div>
+          <div style="display:flex; border-bottom:1px solid var(--panel-alt);">
+            <div class="field-group" style="flex:1; border-right:1px solid var(--panel-alt);">
+              <label>Drawdown Threshold $</label>
+              <input type="number" id="maxDD" class="os-input" oninput="calcBuffer()">
+            </div>
+            <div class="field-group" style="flex:1;">
+              <label>Risk Per Trade $</label>
+              <input type="number" id="riskAmt" class="os-input" oninput="calcBuffer()">
+            </div>
+          </div>
+          <div id="bufferDisplay" class="buffer-row">Survival math required for deployment...</div>
+          <div class="check"><input type="checkbox" class="step"><div class="c-text">Positive <b>R:R Ratio</b> confirmed</div></div>
+          <div class="check"><input type="checkbox" class="step"><div class="c-text">Inversion <b>≤ 3 candles</b></div></div>
+        </div>
 
-              <!-- Snapshot -->
-              <div class="panel" style="grid-column: 1 / -1;">
-                <div class="p-head">Visual Archive</div>
-                <div class="screenshot-zone" onclick="document.getElementById('file-input').click()">
-                  <img id="preview-img">
-                  <span id="upload-hint">CLICK TO UPLOAD CHART SNAPSHOT</span>
-                  <input type="file" id="file-input" style="display: none;" onchange="handlePreview(this)">
-                </div>
+        <!-- THE GATE -->
+        <div class="panel gate" id="os-gate">
+          <div class="scan-line"></div>
+          <div class="p-head"><span class="seq" style="background:var(--amber);">GATE</span> Go / No-Go Validation</div>
+          <div class="check"><input type="checkbox" class="gate-step" disabled><div class="os-c-text">Inside <b>Session Window</b> (9:30–11:00 NY)?</div></div>
+          <div class="check"><input type="checkbox" class="gate-step" disabled><div class="os-c-text">Setup read confirmed from <b>HTF Gap</b>?</div></div>
+          <div class="check"><input type="checkbox" class="gate-step" disabled><div class="os-c-text"><b>Inversion confirmed</b> off highest-TF gap?</div></div>
+          <div class="check"><input type="checkbox" class="gate-step" disabled><div class="os-c-text">This is the <b>Trade I Planned</b> (Not a chase)?</div></div>
+        </div>
+      </div>
+
+      <!-- DYNAMIC EXECUTION FLOW -->
+      <div id="bottom-flow">
+        <div id="exec-alert">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
+        
+        <div id="journal-capture-zone">
+          <div class="grid">
+            <!-- Financials -->
+            <div class="panel" style="grid-column: 1 / -1;">
+              <div class="p-head"><span class="seq">FIN</span> Performance Tracking</div>
+              <div style="display:flex; gap:20px; padding:25px; flex-wrap: wrap;">
+                <div style="flex:1;"><label>BALANCE_BEFORE</label><input type="number" id="balBefore" class="os-input" oninput="calcPnL()"></div>
+                <div style="flex:1;"><label>BALANCE_AFTER</label><input type="number" id="balAfter" class="os-input" oninput="calcPnL()"></div>
+              </div>
+              <div id="pnlResult" class="pnl-output">RESULT: $0.00</div>
+            </div>
+            
+            <!-- Technical Narrative -->
+            <div class="panel">
+              <div class="p-head">Technical Narrative</div>
+              <textarea id="j-logic" rows="12" placeholder="Describe the draw on liquidity and technical alignment..."></textarea>
+            </div>
+            
+            <!-- Psychology -->
+            <div class="panel">
+              <div class="p-head">Psychological Review</div>
+              <textarea id="j-psy" rows="12" placeholder="Internal dialogue pre/during/after trade..."></textarea>
+            </div>
+            
+            <!-- Visuals -->
+            <div class="panel" style="grid-column: 1 / -1;">
+              <div class="p-head">Visual Record</div>
+              <div class="screenshot-zone" onclick="document.getElementById('file-input').click()">
+                <img id="preview-img" src="">
+                <span id="upload-hint">TAP TO UPLOAD CHART SNAPSHOT</span>
+                <input type="file" id="file-input" style="display:none;" onchange="handlePreview(this)">
               </div>
             </div>
           </div>
-
-          <div class="btn-row">
-            <button class="btn btn-commit" onclick="commitToDatabase()">Commit to Database</button>
-            <button class="btn btn-save" onclick="downloadPNG()">Download Photo</button>
-            <button class="btn btn-reset" onclick="resetSession()">Reset Hub</button>
-          </div>
         </div>
-      </section>
 
-      <!-- DATABASE GALLERY -->
-      <section id="page-journal" class="page">
-        <h3>Internal Visual Archives</h3>
-        <div id="gallery-container" class="gallery"></div>
-      </section>
+        <div class="footer-actions">
+          <button class="btn btn-commit" onclick="commitInternalLog()">Commit to Permanent Database</button>
+          <button class="btn btn-save" onclick="downloadManualPNG()">Export High-Res PNG</button>
+          <button class="btn btn-reset" onclick="resetSession()">Reset Hub</button>
+        </div>
+      </div>
+    </main>
 
+    <!-- PAGE 2: INTERNAL ARCHIVE GALLERY -->
+    <main id="page-journal" class="page">
+      <div id="gallery-container">
+        <!-- Visual records render here -->
+      </div>
     </main>
   </div>
 
   <script>
-    // --- DATABASE ENGINE ---
+    // --- DATABASE ARCHITECTURE ---
     let db;
-    const dbReq = indexedDB.open("FeX_DeepArchive_DB", 1);
+    const dbReq = indexedDB.open("FeX_Ultimate_DB_v22", 12);
     dbReq.onupgradeneeded = e => {
       db = e.target.result;
-      db.createObjectStore("logs", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("logs")) db.createObjectStore("logs", { keyPath: "id" });
     };
     dbReq.onsuccess = e => db = e.target.result;
 
-    // --- NAVIGATION ---
-    function switchPage(id, el) {
+    // --- NAVIGATION ENGINE ---
+    function switchPage(id) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('page-' + id).classList.add('active');
-      el.classList.add('active');
-      if (id === 'journal') loadGallery();
+      document.getElementById('btn-' + id).classList.add('active');
+      if (id === 'journal') loadVisualHistory();
+    }
+
+    // --- STATE ENGINE ---
+    function setSetup(t) {
+      document.body.setAttribute('data-setup', t);
+      const root = document.documentElement;
+      const note = document.getElementById('s2-note');
+      if(t === 'continuation') {
+        root.style.setProperty('--current-accent', 'var(--turquoise)');
+        root.style.setProperty('--current-glow', 'var(--turquoise-glow)');
+        note.innerText = "CONTINUATION: Use this gap to trade off of.";
+      } else {
+        root.style.setProperty('--current-accent', 'var(--amber)');
+        root.style.setProperty('--current-glow', 'var(--amber-glow)');
+        note.innerText = "REVERSAL: Waiting for 1H/4H structure to hold before dropping.";
+      }
+      document.getElementById('btn-cont').classList.toggle('active', t === 'continuation');
+      document.getElementById('btn-rev').classList.toggle('active', t === 'reversal');
     }
 
     // --- LOGIC ENGINE ---
     const steps = document.querySelectorAll('.step');
     const gateSteps = document.querySelectorAll('.gate-step');
+    const master = document.getElementById('master');
     const mstatus = document.getElementById('mstatus');
     const mmsg = document.getElementById('mmsg');
-    const gate = document.getElementById('gate');
-    const bottomFlow = document.getElementById('bottom-flow');
+    const flow = document.getElementById('bottom-flow');
+    const gate = document.getElementById('os-gate');
 
-    function updateOS() {
+    function updateMaster() {
       const sDone = Array.from(steps).filter(s => s.checked).length;
       const gDone = Array.from(gateSteps).filter(s => s.checked).length;
-
+      
       if (sDone === steps.length) {
-        gate.classList.add('armed');
-        gateSteps.forEach(gs => gs.disabled = false);
+        gate.classList.add('armed'); gateSteps.forEach(gs => gs.disabled = false);
         mstatus.innerText = "STANDBY";
-        mmsg.innerText = "Gate armed. Complete final Go/No-Go validation.";
+        mmsg.innerText = "Gate armed. Complete final validation protocol.";
       } else {
-        gate.classList.remove('armed');
-        gateSteps.forEach(gs => { gs.disabled = true; gs.checked = false; });
+        gate.classList.remove('armed'); gateSteps.forEach(gs => { gs.disabled = true; gs.checked = false; });
         mstatus.innerText = "NO-GO";
-        mmsg.innerText = "Complete Deployment Stages S1-S4 to arm the gate.";
+        mmsg.innerText = "Complete sections S1–S4 to arm the gate.";
       }
 
       if (sDone === steps.length && gDone === gateSteps.length) {
-        mstatus.innerText = "GO";
-        mstatus.style.color = "var(--green)";
-        bottomFlow.style.display = "block";
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        mstatus.innerText = "GO"; mstatus.style.color = "var(--green)";
+        flow.style.display = "block";
+        window.scrollTo({ top: document.getElementById('exec-alert').offsetTop - 50, behavior: 'smooth' });
       } else {
         mstatus.style.color = "var(--ink)";
-        bottomFlow.style.display = "none";
+        flow.style.display = "none";
       }
     }
-    [...steps, ...gateSteps].forEach(s => s.addEventListener('change', updateOS));
+    [...steps, ...gateSteps].forEach(s => s.addEventListener('change', updateMaster));
 
+    // --- MATH HUB ---
     function calcBuffer() {
       const dd = parseFloat(document.getElementById('maxDD').value);
       const rpt = parseFloat(document.getElementById('riskAmt').value);
       const disp = document.getElementById('bufferDisplay');
-      if (dd > 0 && rpt > 0) disp.innerHTML = `Buffer survives <b>${Math.floor(dd/rpt)}</b> consecutive losses.`;
-      else disp.innerText = "Survival math pending...";
+      if (dd > 0 && rpt > 0) {
+        disp.innerHTML = `Buffer survives <b>${Math.floor(dd/rpt)}</b> consecutive losses.`;
+        disp.style.color = "var(--ink)";
+      } else {
+        disp.innerText = "Survival math required for deployment...";
+        disp.style.color = "var(--line)";
+      }
     }
 
     function calcPnL() {
@@ -573,21 +550,24 @@
       const a = parseFloat(document.getElementById('balAfter').value) || 0;
       const d = a - b;
       const res = document.getElementById('pnlResult');
-      res.innerText = `RESULT: ${d >= 0 ? '+' : ''}$${d.toLocaleString(undefined, {minimumFractionDigits:2})}`;
-      res.className = "pnl-output " + (d > 0 ? "gain" : d < 0 ? "loss" : "");
+      res.innerText = `NET RESULT: ${d >= 0 ? '+' : ''}$${d.toLocaleString(undefined, {minimumFractionDigits:2})}`;
+      res.className = "pnl-output " + (d > 0 ? "pnl-gain" : d < 0 ? "pnl-loss" : "");
     }
 
-    // --- TELEMETRY ---
+    // --- TELEMETRY HUB ---
     function tick() {
       const now = new Date();
       document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+      
       const nyStr = now.toLocaleString("en-US", {timeZone: "America/New_York"});
       const nyDate = new Date(nyStr);
       const nyMins = (nyDate.getHours()*60) + nyDate.getMinutes();
       const inW = nyMins >= (9*60+30) && nyMins <= 11*60;
-      const tag = document.getElementById('session-tag');
+      
+      const tag = document.getElementById('session-status');
       tag.innerText = inW ? "IN WINDOW (NY AM)" : "OUTSIDE WINDOW";
-      tag.className = "session-pill " + (inW ? "pill-in" : "pill-out");
+      tag.className = "session-tag " + (inW ? "tag-in" : "tag-out");
+      
       const diff = now.getTime() - nyDate.getTime();
       const lS = new Date(nyDate.setHours(9, 30, 0, 0) + diff);
       const lE = new Date(nyDate.setHours(11, 0, 0, 0) + diff);
@@ -595,129 +575,106 @@
     }
     setInterval(tick, 1000); tick();
 
-    // --- ARCHIVING HUB ---
+    // --- IMAGE ENGINE ---
     function handlePreview(i) {
       const file = i.files[0];
       if (file) {
         const r = new FileReader();
         r.onload = e => { 
-          document.getElementById('preview-img').src = e.target.result; 
-          document.getElementById('preview-img').style.display='block'; 
+          const img = document.getElementById('preview-img');
+          img.src = e.target.result; 
+          img.style.display='block'; 
           document.getElementById('upload-hint').style.display='none';
         };
         r.readAsDataURL(file);
       }
     }
 
-    async function commitToDatabase() {
+    // --- ARCHIVE ENGINE: THE "NO-CUTOFF" FIX ---
+    async function commitInternalLog() {
       const overlay = document.getElementById('status-overlay');
       overlay.style.display = 'flex';
       
       const logicArea = document.getElementById('j-logic');
       const psyArea = document.getElementById('j-psy');
       
-      // CAPTURE ALL TEXT DATA SEPARATELY
-      const textData = {
-        bias: document.getElementById('biasInput').value,
-        fin: document.getElementById('pnlResult').innerText,
-        logic: logicArea.value,
-        psy: psyArea.value,
-        buffer: document.getElementById('bufferDisplay').innerText
-      };
-
-      // FORCE EXPAND TEXTAREAS
-      const oldLogicH = logicArea.style.height;
-      const oldPsyH = psyArea.style.height;
+      // Temporary Force Expansion to prevent scroll cut-off
+      const oldLogicHeight = logicArea.style.height;
+      const oldPsyHeight = psyArea.style.height;
       logicArea.style.height = logicArea.scrollHeight + "px";
       psyArea.style.height = psyArea.scrollHeight + "px";
 
       try {
         const target = document.getElementById('journal-capture-zone');
-        const canvas = await html2canvas(target, { backgroundColor: "#D1D4DC", scale: 2, useCORS: true });
+        // High fidelity visual capture (2x scale for clarity)
+        const canvas = await html2canvas(target, { backgroundColor: "#D1D4DC", scale: 1.5, useCORS: true });
         
-        // REVERT UI
-        logicArea.style.height = oldLogicH;
-        psyArea.style.height = oldPsyH;
+        // Revert UI to standard state
+        logicArea.style.height = oldLogicHeight;
+        psyArea.style.height = oldPsyHeight;
 
-        const entry = {
-          id: Date.now(),
-          ts: new Date().toLocaleString(),
-          img: canvas.toDataURL("image/jpeg", 0.8),
-          data: textData
-        };
-
+        const entry = { id: Date.now(), ts: new Date().toLocaleString(), img: canvas.toDataURL("image/jpeg", 0.75) };
         const tx = db.transaction("logs", "readwrite");
         tx.objectStore("logs").add(entry);
         tx.oncomplete = () => {
-          overlay.style.display = 'none';
-          alert("TRADE COMMITTED TO DEEP ARCHIVE.");
+          overlay.style.display='none';
+          alert("RECORD COMMITTED TO PERMANENT LOCAL DATABASE.");
         };
       } catch (err) {
-        overlay.style.display = 'none';
-        alert("ARCHIVE FAILURE: " + err);
+        overlay.style.display='none';
+        alert("CRITICAL ERROR: " + err);
       }
     }
 
-    function loadGallery() {
+    function loadVisualHistory() {
       const g = document.getElementById('gallery-container');
-      g.innerHTML = '<div style="text-align:center; padding:50px;">DECRYPTING ARCHIVES...</div>';
+      g.innerHTML = '<div style="text-align:center; font-family:var(--mono); padding:50px;">DECRYPTING ARCHIVES...</div>';
       
       const tx = db.transaction("logs", "readonly");
       tx.objectStore("logs").getAll().onsuccess = e => {
         const logs = e.target.result.sort((a,b) => b.id - a.id);
-        if(!logs.length) {
-          g.innerHTML = '<div class="panel" style="padding:100px; text-align:center;">EMPTY DATABASE.</div>';
-          return;
+        if(!logs.length) { 
+          g.innerHTML = '<div class="panel" style="padding:100px; text-align:center; color:var(--line); border-style:dashed;">DATABASE EMPTY. NO LOGS DETECTED.</div>'; 
+          return; 
         }
         g.innerHTML = logs.map(l => `
-          <div class="history-card">
+          <div class="history-card" onclick="openLightbox('${l.img}')">
             <div class="h-meta">
               <span>RECORD_STAMP: ${l.ts}</span>
-              <div style="display:flex; gap:10px;">
-                <button class="report-btn" onclick="openReport(${l.id})">Tactical Report</button>
-                <button onclick="delLog(${l.id})" style="background:none; border:none; color:var(--red); cursor:pointer; font-family:var(--mono); font-size:10px;">[PURGE]</button>
-              </div>
+              <button onclick="delLog(${l.id}, event)" style="background:none; border:none; color:var(--red); cursor:pointer; font-family:var(--mono); font-size:10px;">[PURGE]</button>
             </div>
-            <img src="${l.img}" class="h-preview" onclick="openLightboxOnly('${l.img}')">
+            <img src="${l.img}" class="h-img-preview" alt="Visual Log">
           </div>
         `).join('');
       };
     }
 
-    function openReport(id) {
-      const tx = db.transaction("logs", "readonly");
-      tx.objectStore("logs").get(id).onsuccess = e => {
-        const l = e.result;
-        const dos = document.getElementById('lb-dossier');
-        document.getElementById('lb-img').src = l.img;
-        dos.innerHTML = `
-          <h2>TECHNICAL DOSSIER // ${l.ts}</h2>
-          <div class="d-section"><div class="d-label">Deployment Result</div><div class="d-value">${l.data.fin}</div></div>
-          <div class="d-section"><div class="d-label">Institutional Bias</div><div class="d-value">${l.data.bias || 'N/A'}</div></div>
-          <div class="d-section"><div class="d-label">Technical Narrative</div><div class="d-value">${l.data.logic || 'N/A'}</div></div>
-          <div class="d-section"><div class="d-label">Psychological State</div><div class="d-value">${l.data.psy || 'N/A'}</div></div>
-          <div class="d-section"><div class="d-label">Risk Context</div><div class="d-value">${l.data.buffer}</div></div>
-        `;
-        document.getElementById('lightbox').style.display = 'block';
-      };
+    function delLog(id, e) {
+      e.stopPropagation();
+      if(confirm("Confirm permanent deletion of record?")) {
+        const tx = db.transaction("logs","readwrite");
+        tx.objectStore("logs").delete(id);
+        tx.oncomplete = () => loadVisualHistory();
+      }
     }
 
-    function openLightboxOnly(src) {
-      document.getElementById('lb-img').src = src;
-      document.getElementById('lb-dossier').innerHTML = "";
-      document.getElementById('lightbox').style.display = 'block';
+    function openLightbox(s) { 
+      document.getElementById('lb-img').src = s; 
+      document.getElementById('lightbox').style.display = 'block'; 
     }
-
-    function closeReport() { document.getElementById('lightbox').style.display = 'none'; }
-    function delLog(id) { if(confirm("Confirm Permanent Purge?")) { db.transaction("logs","readwrite").objectStore("logs").delete(id).onsuccess = loadGallery; } }
-    function resetSession() { if(confirm("Clear Active Console?")) window.location.reload(); }
-    function downloadPNG() {
-      html2canvas(document.getElementById('journal-capture-zone'), { backgroundColor: "#D1D4DC", scale: 2 }).then(c => {
-        const link = document.createElement('a');
-        link.download = `FeX_Trade_${Date.now()}.png`;
-        link.href = c.toDataURL();
+    
+    function downloadManualPNG() {
+      const target = document.getElementById('journal-capture-zone');
+      html2canvas(target, { backgroundColor: "#D1D4DC", scale: 2 }).then(c => {
+        const link = document.createElement('a'); 
+        link.download = `Executioner_Log_${Date.now()}.png`; 
+        link.href = c.toDataURL(); 
         link.click();
       });
+    }
+
+    function resetSession() {
+      if(confirm("Confirm: This will clear the active console. Permanent logs will remain.")) window.location.reload();
     }
   </script>
 </body>
