@@ -3,679 +3,485 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>FeXecutioner | Trading OS v22.0</title>
+<title>FeXecutioner | Trading OS v5.0</title>
 
 <!-- External Resources -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<!-- High-res capture engine -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
   :root {
-    /* Institutional Chart Palette */
-    --bg: #D1D4DC;        /* Primary Canvas */
-    --panel: #FFFFFF;     /* Upclose Candle */
-    --panel-alt: #e9ebf0; /* Muted Background */
-    --line: #787B86;      /* Downclose Candle / Slate */
-    --ink: #050505;       /* Deep Text */
+    --bg: #D1D4DC; /* Chart Background */
+    --panel: #FFFFFF; /* Upclose Candles */
+    --panel-2: #e9ebf0;
+    --line: #787B86; /* Downclose Candles */
+    --ink: #050505;
     --ink-dim: #34363b;
     --ink-faint: #686b72;
-    --turquoise: #00CED1; /* Executioner Highlight */
-    --turquoise-glow: rgba(0, 206, 209, 0.4);
     --green: #27D38C;
     --amber: #E9A23B;
     --red: #E8554E;
-    
     --mono: 'JetBrains Mono', monospace;
     --disp: 'Chakra Petch', sans-serif;
     --body: 'Inter', sans-serif;
-    
-    --current-accent: var(--turquoise);
-    --current-glow: var(--turquoise-glow);
   }
 
-  * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-  
-  /* Scrollbar Customization */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--ink); }
-  ::-webkit-scrollbar-thumb { background: var(--current-accent); border-radius: 10px; }
-
+  * { box-sizing: border-box; }
   body {
     background: var(--bg);
     color: var(--ink);
     font-family: var(--body);
     margin: 0;
-    padding: 20px 15px 120px;
+    padding: 20px 15px 100px;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
   }
 
-  .wrap { max-width: 1100px; margin: 0 auto; position: relative; }
+  .wrap { max-width: 1000px; margin: 0 auto; position: relative; }
 
-  /* Navigation Tabs */
-  .mode-nav { 
-    display: flex; 
-    gap: 2px; 
-    background: var(--line); 
-    padding: 2px; 
-    border-radius: 6px; 
-    margin-bottom: 25px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  }
-  .nav-btn { 
-    flex: 1; 
-    background: var(--bg); 
-    border: none; 
-    padding: 16px; 
-    font-family: var(--mono); 
-    font-weight: 700; 
-    cursor: pointer; 
-    text-transform: uppercase; 
-    font-size: 11px; 
-    transition: 0.3s;
-    border-radius: 4px;
-    color: var(--ink-faint);
-  }
+  /* Navigation */
+  .mode-nav { display: flex; gap: 2px; background: var(--line); padding: 2px; border-radius: 4px; margin-bottom: 20px; }
+  .nav-btn { flex: 1; background: var(--bg); border: none; padding: 14px; font-family: var(--mono); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
   .nav-btn.active { background: var(--ink); color: var(--panel); }
 
-  /* Telemetry / Clock Header */
-  .head { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: flex-end; 
-    border-bottom: 2px solid var(--ink); 
-    padding-bottom: 15px; 
-    margin-bottom: 25px;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-  .brand h1 { font-family: var(--disp); font-size: clamp(24px, 5vw, 36px); margin: 0; text-transform: uppercase; line-height: 1; letter-spacing: 1px; }
-  
+  /* Telemetry Clock Header */
+  .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 20px; }
+  .brand h1 { font-family: var(--disp); font-size: 32px; margin: 0; text-transform: uppercase; line-height: 1; }
   .telemetry { text-align: right; font-family: var(--mono); }
-  .clock { font-size: clamp(28px, 6vw, 42px); font-weight: 700; line-height: 1; letter-spacing: -1px; }
+  .clock { font-size: 36px; font-weight: 700; line-height: 1; letter-spacing: 1px; }
   
-  .session-tag { 
-    font-size: 12px; text-transform: uppercase; font-weight: 800; margin-top: 10px; 
-    padding: 6px 12px; border-radius: 3px; display: inline-block; letter-spacing: 1px;
-    transition: 0.3s;
-  }
+  .session-tag { font-size: 13px; text-transform: uppercase; font-weight: 800; margin-top: 10px; padding: 8px 16px; border-radius: 2px; display: inline-block; letter-spacing: 1px; transition: 0.3s; }
   .tag-out { background: var(--line); color: #FFFFFF; }
   .tag-in { background: #FFFFFF; color: var(--ink); border: 1px solid var(--ink); box-shadow: 0 0 20px rgba(255,255,255,0.8); }
 
-  #local-range { font-size: 12px; font-weight: 700; margin-top: 8px; font-family: var(--mono); color: var(--ink-dim); }
+  #local-range { font-size: 12px; font-weight: 700; margin-top: 8px; font-family: var(--mono); }
+  .range-out { color: var(--line); }
+  .range-in { color: var(--ink); border-bottom: 2px solid var(--ink); }
 
   /* Master Console Display */
-  .master {
-    position: relative; 
-    border: 1px solid var(--ink); 
-    background: var(--panel); 
-    padding: clamp(20px, 5vw, 35px); 
-    margin-bottom: 30px; 
-    box-shadow: 8px 8px 0 var(--line);
-    border-left: 12px solid var(--current-accent);
-    transition: border-color 0.3s;
-  }
-  .m-status { font-family: var(--disp); font-size: clamp(48px, 10vw, 72px); font-weight: 800; line-height: 1; text-transform: uppercase; }
-  #mmsg { font-family: var(--mono); font-size: 13px; color: var(--line); margin-top: 8px; font-weight: 500; }
+  .master { position: relative; border: 1px solid var(--ink); background: var(--panel); padding: 24px; border-radius: 4px; margin-bottom: 20px; box-shadow: 6px 6px 0 var(--line); }
+  .m-status { font-family: var(--disp); font-size: 56px; font-weight: 700; line-height: 1; }
+  #mmsg { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 5px; }
 
-  /* Grid Layout Engine */
+  /* Layout Grid */
   .page { display: none; }
   .page.active { display: block; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .panel { border: 1px solid var(--line); background: var(--panel); border-radius: 4px; overflow: hidden; margin-bottom: 5px; }
+  .p-head { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); }
+  .seq { background: var(--ink); color: var(--panel); font-family: var(--mono); font-size: 10px; padding: 2px 6px; border-radius: 2px; }
+  .p-name { font-family: var(--disp); font-weight: 700; font-size: 14px; text-transform: uppercase; }
 
-  .panel { 
-    border: 1px solid var(--line); 
-    background: var(--panel); 
-    border-radius: 4px; 
-    overflow: hidden; 
-    box-shadow: 4px 4px 0 var(--panel-alt);
-    height: fit-content;
-  }
-  .p-head { 
-    display: flex; 
-    align-items: center; 
-    gap: 12px; 
-    padding: 15px 20px; 
-    background: var(--panel-alt); 
-    border-bottom: 1px solid var(--line);
-    font-family: var(--disp);
-    font-weight: 700;
-    font-size: 15px;
-    text-transform: uppercase;
-  }
-  .seq { background: var(--ink); color: var(--panel); font-family: var(--mono); font-size: 11px; padding: 3px 8px; border-radius: 2px; }
+  /* Continuation / Reversal Toggle */
+  .setup-toggle { display: flex; gap: 5px; padding: 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); }
+  .s-btn { flex: 1; padding: 8px; font-family: var(--mono); font-size: 10px; font-weight: 700; border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; background: var(--panel); }
+  .s-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
 
-  /* Setup State Toggles */
-  .setup-toggle { display: flex; gap: 4px; padding: 12px; background: var(--panel-alt); border-bottom: 1px solid var(--line); }
-  .s-btn { 
-    flex: 1; padding: 12px; font-family: var(--mono); font-size: 11px; font-weight: 700; 
-    border: 1px solid var(--line); cursor: pointer; text-transform: uppercase; 
-    background: #fff; transition: 0.3s; color: var(--line);
-  }
-  .s-btn.active[onclick*="continuation"] { 
-    background: var(--ink); color: var(--turquoise); border-color: var(--turquoise); 
-    box-shadow: 0 0 15px var(--turquoise-glow); 
-  }
-  .s-btn.active[onclick*="reversal"] { 
-    background: var(--ink); color: var(--amber); border-color: var(--amber); 
-    box-shadow: 0 0 15px var(--amber-glow); 
-  }
-
-  /* Checklist Items */
-  .check { 
-    display: flex; 
-    gap: 15px; 
-    padding: 18px 20px; 
-    cursor: pointer; 
-    align-items: flex-start; 
-    transition: 0.15s;
-    border-bottom: 1px solid var(--panel-alt);
-  }
-  .check:last-child { border-bottom: none; }
-  .check:hover { background: var(--panel-alt); }
-  .check input { width: 24px; height: 24px; accent-color: var(--ink); cursor: pointer; flex-shrink: 0; }
-  .c-text { font-size: 15px; line-height: 1.5; font-weight: 500; color: var(--ink-dim); }
-  .c-text b { font-weight: 700; color: var(--ink); }
-  .note { display: block; font-size: 11px; color: var(--line); font-family: var(--mono); margin-top: 6px; }
-
-  /* Logic Accents */
+  /* Checkbox Items */
+  .check { display: flex; gap: 12px; padding: 14px 12px; cursor: pointer; align-items: flex-start; transition: 0.1s; }
+  .check:hover { background: var(--panel-2); }
+  .check input { width: 20px; height: 20px; accent-color: var(--ink); margin-top: 2px; cursor: pointer; }
+  .c-text { font-size: 14px; line-height: 1.4; font-weight: 500; }
+  .note { display: block; font-size: 11px; color: var(--ink-faint); font-family: var(--mono); margin-top: 5px; }
+  
   .note-continuation { color: var(--green); display: none; }
   .note-reversal { color: var(--amber); display: none; }
   body[data-setup="continuation"] .note-continuation { display: block; }
   body[data-setup="reversal"] .note-reversal { display: block; }
 
-  /* Inputs & Buffer */
-  .field-group { padding: 20px; border-bottom: 1px solid var(--panel-alt); }
-  label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--line); margin-bottom: 8px; letter-spacing: 1px; }
-  
-  textarea, .os-input { 
-    width: 100%; 
-    border: 1px solid var(--line); 
-    background: var(--panel-alt); 
-    padding: 15px; 
-    font-family: var(--body); 
-    font-size: 14px; 
-    border-radius: 4px; 
-    color: var(--ink);
-    transition: 0.2s;
-  }
-  textarea:focus, .os-input:focus { background: #fff; border-color: var(--current-accent); }
-  
-  .buffer-row { 
-    background: var(--panel-alt); 
-    padding: 20px; 
-    font-family: var(--mono); 
-    font-size: 12px; 
-    line-height: 1.6; 
-    border-bottom: 1px solid var(--line);
-    color: var(--ink-dim);
-  }
+  /* Risk & Calculation UI */
+  .buffer-row { background: var(--panel-2); padding: 15px; font-family: var(--mono); font-size: 11px; line-height: 1.6; border-bottom: 1px solid var(--line); }
   .buffer-row b { color: var(--red); font-weight: 700; }
 
-  /* Gate Logic HUD */
-  .gate { position: relative; border: 2px solid var(--line); transition: 0.6s; grid-column: 1 / -1; }
-  .gate.armed { border-color: var(--current-accent); box-shadow: 0 0 30px var(--current-glow); }
-  .scan-line {
-    position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, var(--current-glow), transparent);
-    pointer-events: none;
-  }
-  .gate.armed .scan-line { animation: scan-anim 3s linear infinite; }
-  @keyframes scan-anim { from { left: -100%; } to { left: 100%; } }
+  /* The Gate & Scan Line */
+  .gate { position: relative; border: 2px solid var(--line); transition: 0.5s; }
+  .gate.armed { border-color: var(--green); box-shadow: 0 0 20px rgba(39, 211, 140, 0.2); }
+  .scan-line { position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(39, 211, 140, 0.15), transparent); pointer-events: none; }
+  .gate.armed .scan-line { animation: scan 2s linear infinite; }
+  @keyframes scan { from { left: -100%; } to { left: 100%; } }
 
-  /* GO FLOW DYNAMICS */
-  #bottom-flow { display: none; margin-top: 60px; border-top: 4px solid var(--ink); padding-top: 60px; }
-  
-  #exec-alert {
-    background: var(--ink); color: #fff; padding: 30px; 
-    text-align: center; font-family: var(--mono); font-weight: 700; margin-bottom: 35px;
-    animation: blink 1.2s infinite; letter-spacing: 6px; font-size: 20px;
-    border-radius: 4px; border: 1px solid var(--current-accent);
-  }
-  @keyframes blink { 50% { opacity: 0.3; } }
+  /* BOTTOM EXECUTION FLOW (DYNAMIC) */
+  #bottom-flow { display: none; margin-top: 40px; border-top: 4px solid var(--ink); padding-top: 40px; }
+  #exec-alert { background: var(--ink); color: var(--panel); padding: 18px; text-align: center; font-family: var(--mono); font-weight: 700; margin-bottom: 25px; animation: blink 1.2s infinite; letter-spacing: 4px; font-size: 14px; border-radius: 4px; }
+  @keyframes blink { 50% { opacity: 0.4; } }
+  #journal-capture-zone { padding: 25px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
 
-  #journal-area { padding: clamp(10px, 4vw, 30px); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+  /* Financial PnL Panel */
+  .pnl-output { padding: 20px; text-align: center; font-family: var(--disp); font-size: 32px; font-weight: 700; border-radius: 4px; margin-top: 10px; transition: 0.3s; border: 1px solid var(--line); }
+  .pnl-gain { background: var(--panel); color: var(--green); border-color: var(--green); box-shadow: 0 0 15px rgba(39, 211, 140, 0.2); }
+  .pnl-loss { background: var(--line); color: var(--panel); border-color: var(--ink); }
 
-  /* Financial Summary */
-  .pnl-output { 
-    padding: 40px; text-align: center; font-family: var(--disp); font-size: clamp(32px, 8vw, 48px); 
-    font-weight: 800; margin-top: 20px; border: 2px solid var(--line); border-radius: 4px; 
-    transition: 0.5s; 
-  }
-  .pnl-gain { background: #fff; color: var(--green); border-color: var(--green); box-shadow: 0 0 30px rgba(39, 211, 140, 0.3); }
-  .pnl-loss { background: var(--line); color: #fff; border-color: var(--ink); }
+  /* Input Group */
+  .field-group { padding: 12px; border-bottom: 1px solid var(--panel-2); }
+  label { display: block; font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
+  textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid var(--line); background: var(--panel-2); padding: 12px; font-family: var(--body); font-size: 13px; border-radius: 2px; color: var(--ink); }
 
-  /* Screenshot Upload */
-  .screenshot-zone {
-    border: 2px dashed var(--line); background: var(--panel-alt); min-height: 350px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; position: relative; margin: 15px; border-radius: 4px; overflow: hidden;
-  }
-  .screenshot-zone img { width: 100%; height: 100%; object-fit: contain; position: absolute; display: none; }
-  .screenshot-zone span { font-family: var(--mono); font-size: 12px; color: var(--line); text-transform: uppercase; letter-spacing: 2px; }
+  .screenshot-zone { border: 2px dashed var(--line); background: var(--panel-2); min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; margin: 15px; border-radius: 4px; overflow: hidden; }
+  .screenshot-zone img { max-width: 100%; height: auto; display: block; }
 
-  /* Action Buttons */
-  .footer-actions { display: flex; gap: 15px; margin-top: 50px; flex-wrap: wrap; }
-  .btn { 
-    flex: 1; min-width: 250px; padding: 22px; font-family: var(--mono); font-weight: 700; border-radius: 4px; 
-    cursor: pointer; text-transform: uppercase; border: 1px solid var(--ink); font-size: 13px; transition: 0.3s;
-  }
-  .btn-save { background: var(--ink); color: var(--panel); border: none; }
+  /* Internal Database Styling */
+  .history-item { margin-bottom: 30px; border: 1px solid var(--line); background: var(--panel); border-radius: 4px; overflow: hidden; box-shadow: 6px 6px 0 var(--line); }
+  .history-meta { padding: 12px 15px; background: var(--ink); color: white; font-family: var(--mono); font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
+  .history-thumb { width: 100%; max-height: 400px; overflow-y: auto; cursor: zoom-in; }
+  .history-thumb img { width: 100%; height: auto; display: block; }
+
+  /* Lightbox */
+  #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; padding: 40px; overflow-y: auto; text-align: center; }
+  #lightbox img { max-width: 100%; height: auto; border: 2px solid white; }
+  .close-lightbox { position: fixed; top: 20px; right: 20px; color: white; font-family: var(--mono); font-size: 14px; cursor: pointer; background: var(--red); padding: 10px 20px; border-radius: 4px; z-index: 10001; }
+
+  /* Actions */
+  .footer-actions { display: flex; gap: 10px; margin-top: 40px; }
+  .btn { flex: 1; padding: 20px; font-family: var(--mono); font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; border: 1px solid var(--ink); font-size: 11px; transition: 0.2s; }
   .btn-commit { background: var(--green); color: var(--ink); border-color: var(--ink); }
+  .btn-save { background: var(--ink); color: var(--panel); border: none; }
   .btn-reset { background: transparent; color: var(--ink-faint); border-color: var(--line); }
-  .btn:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
-
-  /* Internal Archive Gallery */
-  #gallery-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
-  .history-card { border: 1px solid var(--line); background: #fff; border-radius: 4px; overflow: hidden; box-shadow: 8px 8px 0 var(--line); cursor: zoom-in; transition: 0.3s; }
-  .history-card:hover { transform: scale(1.02); }
-  .h-meta { padding: 15px 20px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
-  .h-img-preview { width: 100%; max-height: 450px; object-fit: cover; display: block; filter: brightness(0.95); }
-
-  /* Tactical Lightbox (Expanding File View) */
-  #lightbox { 
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
-    z-index: 10001; padding: clamp(10px, 5vw, 60px); overflow-y: auto; text-align: center; 
-  }
-  #lightbox img { max-width: 100%; height: auto; border: 3px solid #fff; box-shadow: 0 0 80px rgba(0,0,0,0.8); }
-  .close-lb { 
-    position: fixed; top: 20px; right: 20px; color: #fff; background: var(--red); 
-    padding: 12px 25px; font-family: var(--mono); font-weight: 700; cursor: pointer; 
-    border-radius: 4px; z-index: 10002; text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  }
-
-  /* Capture Overlay */
-  #status-overlay { 
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
-    z-index: 10002; color: white; flex-direction: column; align-items: center; 
-    justify-content: center; font-family: var(--mono); letter-spacing: 3px; text-align: center; 
-  }
-
-  @media (max-width: 768px) {
-    .head { flex-direction: column; align-items: flex-start; }
-    .os-clock { margin-bottom: 5px; }
-    .os-grid { grid-template-columns: 1fr; }
-    .btn { width: 100%; }
-    .viewport { padding: 30px 15px; }
-  }
+  
+  #status-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; color: white; flex-direction: column; align-items: center; justify-content: center; font-family: var(--mono); }
 </style>
 </head>
 <body data-setup="continuation">
 
-  <div class="scanline"></div>
-  <div id="lightbox" onclick="this.style.display='none'">
-    <span class="close-lb">CLOSE LOG [X]</span>
-    <img id="lb-img" src="">
-  </div>
-  
-  <div id="status-overlay">
-    <div style="font-size: 28px; margin-bottom: 25px; color: var(--current-accent);">DECRYPTING DATA...</div>
-    <div style="font-size: 12px; color: #fff; opacity: 0.6;">WRITING FULL-TEXT dossiers TO LOCAL PERMANENT DATABASE.</div>
-  </div>
+<!-- Overlay UI -->
+<div id="status-overlay">
+  <div style="font-size: 20px; margin-bottom: 10px; letter-spacing: 2px;">SYNCING VISUAL DATABASE...</div>
+  <div style="font-size: 12px; color: var(--green);">Generating high-res trade record.</div>
+</div>
 
-  <div class="wrap">
+<div id="lightbox" onclick="this.style.display='none'">
+  <span class="close-lightbox">CLOSE FILE [X]</span>
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="wrap">
+  <nav class="mode-nav">
+    <button class="nav-btn active" id="btn-exec" onclick="switchPage('exec')">Execution Mode</button>
+    <button class="nav-btn" id="btn-journal" onclick="switchPage('journal')">Internal Journal</button>
+  </nav>
+
+  <header class="head">
+    <div class="brand">
+      <div style="font-family:var(--mono); font-size:10px; letter-spacing:4px; color:var(--ink-faint);">FEXECUTIONER</div>
+      <h1>CONSOLE</h1>
+    </div>
+    <div class="telemetry">
+      <div class="clock" id="clock">00:00:00</div>
+      <div id="session-status" class="session-tag tag-out">Checking Window...</div>
+      <div id="local-range" class="range-out">LOCAL: --:--</div>
+    </div>
+  </header>
+
+  <section class="master" id="master">
+    <div class="m-status" id="mstatus">NO-GO</div>
+    <div id="mmsg">Complete sections S1 through S4 to arm the execution gate.</div>
+  </section>
+
+  <!-- PAGE 1: EXECUTION -->
+  <main id="page-exec" class="page active">
+    <div class="grid">
+      <!-- S1 -->
+      <div class="panel">
+        <div class="p-head"><span class="seq">S1</span><span class="p-name">Bias & HTF Gap</span></div>
+        <div class="setup-toggle">
+          <button class="s-btn active" id="btn-cont" onclick="setSetup('continuation')">Continuation</button>
+          <button class="s-btn" id="btn-rev" onclick="setSetup('reversal')">Reversal</button>
+        </div>
+        <div class="field-group">
+          <label>Directional Bias</label>
+          <input type="text" id="biasInput" placeholder="HTF Bias and reasoning...">
+        </div>
+        <div class="items">
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Checked <b>Premarket price action</b><span class="note">Reviewed overnight highs/lows and premarket VWAP levels.</span></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Found the most recent <b>1H / 4H FVG</b><span class="note">The higher timeframe fair value gap price is currently reacting to.</span></span></label>
+        </div>
+      </div>
+
+      <!-- S2 -->
+      <div class="panel">
+        <div class="p-head"><span class="seq">S2</span><span class="p-name">Scale to 5m / 15m</span></div>
+        <div class="items">
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Marked the <b>5m / 15m Gap</b>
+            <span class="note note-continuation">CONTINUATION: This is the specific gap you will actually trade off of.</span>
+            <span class="note note-reversal">REVERSAL: Watching for 1H/4H structure to hold before dropping down.</span>
+          </span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Confirmed <b>Manipulation</b><span class="note">Price ran into the 5m/15m gap and swept internal/session liquidity.</span></span></label>
+        </div>
+      </div>
+
+      <!-- S3 -->
+      <div class="panel">
+        <div class="p-head"><span class="seq">S3</span><span class="p-name">Inversion (1m–5m)</span></div>
+        <div class="items">
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Found the <b>Inversion</b> on the 1–5 min chart<span class="note">30-sec only if nothing shows up here — 1m is preferred.</span></span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">It's the <b>Highest-TF Gap</b> in that leg<span class="note">Must be the primary gap made during that specific manipulation leg.</span></span></label>
+        </div>
+      </div>
+
+      <!-- S4 -->
+      <div class="panel">
+        <div class="p-head"><span class="seq">S4</span><span class="p-name">Risk & Buffer</span></div>
+        <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
+          <div class="field-group"><label>Account Size $</label><input type="number" id="acctSize" placeholder="50000"></div>
+          <div class="field-group"><label>Total Drawdown $</label><input type="number" id="maxDD" placeholder="2000" oninput="calcBuffer()"></div>
+        </div>
+        <div class="field-group"><label>Risk Per Trade $</label><input type="number" id="riskPerTrade" placeholder="400" oninput="calcBuffer()"></div>
+        <div class="buffer-row" id="bufferDisplay">Enter data to calculate buffer.</div>
+        <div class="items">
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Positive <b>R:R Ratio</b> confirmed</span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Targeting <b>Clear Liquidity</b> pool</span></label>
+          <label class="check"><input type="checkbox" class="step"> <span class="c-text">Inversion within <b>3 candles or less</b></span></label>
+        </div>
+      </div>
+
+      <!-- THE GATE -->
+      <div class="panel gate" id="gate" style="grid-column: 1 / -1;">
+        <div class="scan-line"></div>
+        <div class="p-head"><span class="seq" style="background:var(--amber)">GATE</span><span class="p-name">Final Go / No-Go Gate</span></div>
+        <div class="items" id="gateItems">
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">Inside my <b>Session Window</b>?</span></label>
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">Setup confirmed from <b>HTF Gap</b>?</span></label>
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">5m/15m gap <b>manipulated + swept</b>?</span></label>
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text"><b>Inversion confirmed</b> off highest-TF gap?</span></label>
+          <label class="check"><input type="checkbox" class="gate-step" disabled> <span class="c-text">This is the trade I <b>planned for</b>?</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM EXECUTION FLOW -->
+    <div id="bottom-flow">
+      <div id="exec-alert">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
+      <div id="journal-capture-zone">
+        <div class="grid">
+          <!-- Financials -->
+          <div class="panel" style="grid-column: 1 / -1;">
+            <div class="p-head"><span class="seq">FIN</span><span class="p-name">Daily Financials</span></div>
+            <div class="grid" style="grid-template-columns: repeat(3, 1fr); border:none; gap:0;">
+              <div class="field-group"><label>Balance Before</label><input type="number" id="balBefore" oninput="calcPnL()"></div>
+              <div class="field-group"><label>Balance After</label><input type="number" id="balAfter" oninput="calcPnL()"></div>
+              <div class="field-group"><label>PnL Amount</label><input type="number" id="manualPnL" placeholder="Auto-calculated"></div>
+            </div>
+            <div id="pnlResult" class="pnl-output">NET RESULT: $0.00</div>
+          </div>
+
+          <div class="panel" style="grid-column: 1 / -1;">
+            <div class="p-head"><span class="seq">ANL</span><span class="p-name">Post-Trade Analysis</span></div>
+            <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
+              <div class="field-group"><label>HTF Bias Logic</label><textarea id="j-htf" rows="4"></textarea></div>
+              <div class="field-group"><label>LTF Target & Liquidity</label><textarea id="j-ltf" rows="4"></textarea></div>
+            </div>
+            <div class="field-group"><label>Entry Model & Exact Time</label><input type="text" id="j-entry"></div>
+          </div>
+
+          <div class="panel">
+            <div class="p-head"><span class="seq">PSY</span><span class="p-name">Psychology Review</span></div>
+            <div class="field-group"><label>Morning Routine / Wake Up</label><input type="text" id="j-wake"></div>
+            <div class="field-group"><label>Feelings (Pre / During / After)</label><textarea id="j-feelings" rows="5"></textarea></div>
+          </div>
+
+          <div class="panel">
+            <div class="p-head"><span class="seq">IMG</span><span class="p-name">Chart Snapshot</span></div>
+            <div class="screenshot-zone" onclick="document.getElementById('file-input').click()">
+              <img id="preview-img" src="" style="display:none;">
+              <span id="upload-hint">Upload chart screenshot</span>
+              <input type="file" id="file-input" style="display:none;" onchange="handlePreview(this)">
+            </div>
+          </div>
+
+          <div class="panel" style="grid-column: 1 / -1;">
+            <div class="p-head"><span class="seq">REF</span><span class="p-name">Reflection</span></div>
+            <div class="items" style="display:flex; gap:20px; border-bottom:1px solid var(--panel-2);">
+              <label class="check"><input type="checkbox" id="j-rules"> <span class="c-text">Followed Rules</span></label>
+              <label class="check"><input type="checkbox" id="j-emotions"> <span class="c-text">Emotions Controlled</span></label>
+            </div>
+            <div class="grid" style="grid-template-columns: 1fr 1fr; border:none; gap:0;">
+              <div class="field-group"><label>Rule Breaks</label><textarea id="j-broken" rows="3"></textarea></div>
+              <div class="field-group"><label>Improvements</label><textarea id="j-better" rows="3"></textarea></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer-actions">
+        <button class="btn btn-commit" onclick="commitInternalVisual()">Commit to Internal Journal</button>
+        <button class="btn btn-save" onclick="downloadManualPNG()">Download Journal Photo</button>
+        <button class="btn btn-reset" onclick="resetSession()">Reset Console</button>
+      </footer>
+    </div>
+  </main>
+
+  <!-- PAGE 2: JOURNAL -->
+  <main id="page-journal" class="page">
+    <div id="internal-gallery">
+      <!-- Records load here -->
+    </div>
+  </main>
+</div>
+
+<script>
+  // --- DB SETUP ---
+  let db;
+  const dbReq = indexedDB.open("FExecDBv2", 1);
+  dbReq.onupgradeneeded = e => {
+    db = e.target.result;
+    if (!db.objectStoreNames.contains("trades")) db.createObjectStore("trades", { keyPath: "id" });
+  };
+  dbReq.onsuccess = e => db = e.target.result;
+
+  function switchPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.getElementById('btn-' + id).classList.add('active');
+    if(id === 'journal') loadInternalGallery();
+  }
+
+  function setSetup(type) {
+    document.body.setAttribute('data-setup', type);
+    document.getElementById('btn-cont').classList.toggle('active', type === 'continuation');
+    document.getElementById('btn-rev').classList.toggle('active', type === 'reversal');
+  }
+
+  // --- LOGIC ---
+  const steps = document.querySelectorAll('.step');
+  const gateSteps = document.querySelectorAll('.gate-step');
+  const master = document.getElementById('master');
+  const mstatus = document.getElementById('mstatus');
+  const mmsg = document.getElementById('mmsg');
+  const flow = document.getElementById('bottom-flow');
+  const gate = document.getElementById('gate');
+
+  function updateMaster() {
+    const sDone = Array.from(steps).filter(s => s.checked).length;
+    const gDone = Array.from(gateSteps).filter(s => s.checked).length;
+    if (sDone === steps.length) {
+      gate.classList.add('armed');
+      gateSteps.forEach(gs => gs.disabled = false);
+      mstatus.innerText = "STANDBY";
+    } else {
+      gate.classList.remove('armed');
+      gateSteps.forEach(gs => { gs.disabled = true; gs.checked = false; });
+      mstatus.innerText = "NO-GO";
+    }
+    if (sDone === steps.length && gDone === gateSteps.length) {
+      mstatus.innerText = "GO";
+      mstatus.style.color = "var(--green)";
+      flow.style.display = "block";
+      window.scrollTo({ top: document.getElementById('exec-alert').offsetTop - 50, behavior: 'smooth' });
+    } else {
+      mstatus.style.color = "var(--ink)";
+      flow.style.display = "none";
+    }
+  }
+  [...steps, ...gateSteps].forEach(s => s.addEventListener('change', updateMaster));
+
+  // --- CALCULATORS ---
+  function calcBuffer() {
+    const dd = parseFloat(document.getElementById('maxDD').value);
+    const rpt = parseFloat(document.getElementById('riskPerTrade').value);
+    const disp = document.getElementById('bufferDisplay');
+    if (dd > 0 && rpt > 0) disp.innerHTML = `Buffer survives <b>${Math.floor(dd/rpt)}</b> consecutive losses.`;
+    else disp.innerText = "Enter data to calculate buffer.";
+  }
+
+  function calcPnL() {
+    const before = parseFloat(document.getElementById('balBefore').value) || 0;
+    const after = parseFloat(document.getElementById('balAfter').value) || 0;
+    const diff = after - before;
+    const display = document.getElementById('pnlResult');
+    const manualField = document.getElementById('manualPnL');
+
+    manualField.value = diff.toFixed(2);
+    display.innerText = `NET RESULT: ${diff >= 0 ? '+' : ''}$${diff.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
     
-    <nav class="mode-nav">
-      <button class="nav-btn active" id="btn-exec" onclick="switchPage('exec')">Execution Mode</button>
-      <button class="nav-btn" id="btn-journal" onclick="switchPage('journal')">Internal Archive</button>
-    </nav>
-
-    <header class="head">
-      <div class="brand">
-        <div style="font-family:var(--mono); font-size:10px; color:var(--line); letter-spacing:4px;">FEXECUTIONER</div>
-        <h1>CONSOLE</h1>
-      </div>
-      <div class="telemetry">
-        <div class="clock" id="clock">00:00:00</div>
-        <div id="session-status" class="session-tag tag-out">Checking Window...</div>
-        <div id="local-range" style="font-size:12px; font-family:var(--mono); margin-top:10px; font-weight:700;">LOCAL: --:--</div>
-      </div>
-    </header>
-
-    <section class="master" id="master">
-      <div class="m-status" id="mstatus">NO-GO</div>
-      <div id="mmsg" style="font-family:var(--mono); font-size:13px; color:var(--line); margin-top:8px;">Complete sections S1–S4 to arm the execution gate.</div>
-    </section>
-
-    <!-- PAGE 1: EXECUTION ENGINE -->
-    <main id="page-exec" class="page active">
-      <div class="grid">
-        
-        <!-- S1 -->
-        <div class="panel">
-          <div class="p-head"><span class="seq">S1</span> Bias & HTF Gap</div>
-          <div class="setup-toggle">
-            <button class="s-btn active" id="btn-cont" onclick="setSetup('continuation')">Continuation</button>
-            <button class="s-btn" id="btn-rev" onclick="setSetup('reversal')">Reversal</button>
-          </div>
-          <div class="field-group">
-            <label>Technical Directional Bias</label>
-            <input type="text" id="biasInput" class="os-input" placeholder="HTF context and reasoning...">
-          </div>
-          <div class="check"><input type="checkbox" class="step"><div class="c-text">Checked <b>Premarket PA</b><span class="note">Reviewed overnight highs/lows and premarket VWAP levels.</span></div></div>
-          <div class="check"><input type="checkbox" class="step"><div class="c-text">Found most recent <b>1H / 4H FVG</b><span class="note">The specific anchor price is reacting to.</span></div></div>
-        </div>
-
-        <!-- S2 -->
-        <div class="panel">
-          <div class="p-head"><span class="seq">S2</span> Scale to 5m / 15m</div>
-          <div class="check"><input type="checkbox" class="step"><div class="c-text">Marked the <b>5m / 15m Gap</b>
-            <span class="note" id="s2-note">CONTINUATION: Use this gap to trade off of.</span>
-          </div></div>
-          <div class="check"><input type="checkbox" class="step"><div class="c-text">Confirmed <b>Manipulation</b><span class="note">Price ran into the gap and swept internal liquidity.</span></div></div>
-        </div>
-
-        <!-- S3 -->
-        <div class="panel">
-          <div class="p-head"><span class="seq">S3</span> Inversion hierarchy</div>
-          <div class="check"><input type="checkbox" class="step"><div class="c-text">Found the <b>Inversion</b> on 1–5 min chart<span class="note">1m preferred. <b>30-sec only if extreme displacement</b> and no LTF gaps form.</span></div></div>
-          <div class="check"><input type="checkbox" class="step"><div class="c-text">It's the <b>Highest-TF Gap</b> in that leg<span class="note">Primary gap made during that specific manipulation leg.</span></div></div>
-        </div>
-
-        <!-- S4 -->
-        <div class="panel">
-          <div class="p-head"><span class="seq">S4</span> Risk & Survival</div>
-          <div style="display:flex; border-bottom:1px solid var(--panel-alt);">
-            <div class="field-group" style="flex:1; border-right:1px solid var(--panel-alt);">
-              <label>Drawdown Threshold $</label>
-              <input type="number" id="maxDD" class="os-input" oninput="calcBuffer()">
-            </div>
-            <div class="field-group" style="flex:1;">
-              <label>Risk Per Trade $</label>
-              <input type="number" id="riskAmt" class="os-input" oninput="calcBuffer()">
-            </div>
-          </div>
-          <div id="bufferDisplay" class="buffer-row">Survival math required for deployment...</div>
-          <div class="check"><input type="checkbox" class="step"><div class="c-text">Positive <b>R:R Ratio</b> confirmed</div></div>
-          <div class="check"><input type="checkbox" class="step"><div class="c-text">Inversion <b>≤ 3 candles</b></div></div>
-        </div>
-
-        <!-- THE GATE -->
-        <div class="panel gate" id="os-gate">
-          <div class="scan-line"></div>
-          <div class="p-head"><span class="seq" style="background:var(--amber);">GATE</span> Go / No-Go Validation</div>
-          <div class="check"><input type="checkbox" class="gate-step" disabled><div class="os-c-text">Inside <b>Session Window</b> (9:30–11:00 NY)?</div></div>
-          <div class="check"><input type="checkbox" class="gate-step" disabled><div class="os-c-text">Setup read confirmed from <b>HTF Gap</b>?</div></div>
-          <div class="check"><input type="checkbox" class="gate-step" disabled><div class="os-c-text"><b>Inversion confirmed</b> off highest-TF gap?</div></div>
-          <div class="check"><input type="checkbox" class="gate-step" disabled><div class="os-c-text">This is the <b>Trade I Planned</b> (Not a chase)?</div></div>
-        </div>
-      </div>
-
-      <!-- DYNAMIC EXECUTION FLOW -->
-      <div id="bottom-flow">
-        <div id="exec-alert">IT IS EXECUTION TIME. FOLLOW YOUR RULES.</div>
-        
-        <div id="journal-capture-zone">
-          <div class="grid">
-            <!-- Financials -->
-            <div class="panel" style="grid-column: 1 / -1;">
-              <div class="p-head"><span class="seq">FIN</span> Performance Tracking</div>
-              <div style="display:flex; gap:20px; padding:25px; flex-wrap: wrap;">
-                <div style="flex:1;"><label>BALANCE_BEFORE</label><input type="number" id="balBefore" class="os-input" oninput="calcPnL()"></div>
-                <div style="flex:1;"><label>BALANCE_AFTER</label><input type="number" id="balAfter" class="os-input" oninput="calcPnL()"></div>
-              </div>
-              <div id="pnlResult" class="pnl-output">RESULT: $0.00</div>
-            </div>
-            
-            <!-- Technical Narrative -->
-            <div class="panel">
-              <div class="p-head">Technical Narrative</div>
-              <textarea id="j-logic" rows="12" placeholder="Describe the draw on liquidity and technical alignment..."></textarea>
-            </div>
-            
-            <!-- Psychology -->
-            <div class="panel">
-              <div class="p-head">Psychological Review</div>
-              <textarea id="j-psy" rows="12" placeholder="Internal dialogue pre/during/after trade..."></textarea>
-            </div>
-            
-            <!-- Visuals -->
-            <div class="panel" style="grid-column: 1 / -1;">
-              <div class="p-head">Visual Record</div>
-              <div class="screenshot-zone" onclick="document.getElementById('file-input').click()">
-                <img id="preview-img" src="">
-                <span id="upload-hint">TAP TO UPLOAD CHART SNAPSHOT</span>
-                <input type="file" id="file-input" style="display:none;" onchange="handlePreview(this)">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="footer-actions">
-          <button class="btn btn-commit" onclick="commitInternalLog()">Commit to Permanent Database</button>
-          <button class="btn btn-save" onclick="downloadManualPNG()">Export High-Res PNG</button>
-          <button class="btn btn-reset" onclick="resetSession()">Reset Hub</button>
-        </div>
-      </div>
-    </main>
-
-    <!-- PAGE 2: INTERNAL ARCHIVE GALLERY -->
-    <main id="page-journal" class="page">
-      <div id="gallery-container">
-        <!-- Visual records render here -->
-      </div>
-    </main>
-  </div>
-
-  <script>
-    // --- DATABASE ARCHITECTURE ---
-    let db;
-    const dbReq = indexedDB.open("FeX_Ultimate_DB_v22", 12);
-    dbReq.onupgradeneeded = e => {
-      db = e.target.result;
-      if (!db.objectStoreNames.contains("logs")) db.createObjectStore("logs", { keyPath: "id" });
-    };
-    dbReq.onsuccess = e => db = e.target.result;
-
-    // --- NAVIGATION ENGINE ---
-    function switchPage(id) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('page-' + id).classList.add('active');
-      document.getElementById('btn-' + id).classList.add('active');
-      if (id === 'journal') loadVisualHistory();
+    if (diff > 0) {
+      display.className = "pnl-output pnl-gain";
+    } else if (diff < 0) {
+      display.className = "pnl-output pnl-loss";
+    } else {
+      display.className = "pnl-output";
     }
+  }
 
-    // --- STATE ENGINE ---
-    function setSetup(t) {
-      document.body.setAttribute('data-setup', t);
-      const root = document.documentElement;
-      const note = document.getElementById('s2-note');
-      if(t === 'continuation') {
-        root.style.setProperty('--current-accent', 'var(--turquoise)');
-        root.style.setProperty('--current-glow', 'var(--turquoise-glow)');
-        note.innerText = "CONTINUATION: Use this gap to trade off of.";
-      } else {
-        root.style.setProperty('--current-accent', 'var(--amber)');
-        root.style.setProperty('--current-glow', 'var(--amber-glow)');
-        note.innerText = "REVERSAL: Waiting for 1H/4H structure to hold before dropping.";
-      }
-      document.getElementById('btn-cont').classList.toggle('active', t === 'continuation');
-      document.getElementById('btn-rev').classList.toggle('active', t === 'reversal');
-    }
+  // --- TELEMETRY ---
+  function tick() {
+    const now = new Date();
+    document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+    const nyStr = now.toLocaleString("en-US", {timeZone: "America/New_York"});
+    const nyDate = new Date(nyStr);
+    const nyMins = (nyDate.getHours() * 60) + nyDate.getMinutes();
+    const isIn = nyMins >= (9*60+30) && nyMins <= 11*60;
+    const tag = document.getElementById('session-status');
+    const range = document.getElementById('local-range');
+    tag.innerText = isIn ? "IN WINDOW (NY AM)" : "OUTSIDE WINDOW";
+    tag.className = "session-tag " + (isIn ? "tag-in" : "tag-out");
+    range.className = isIn ? "range-in" : "range-out";
+    const diff = now.getTime() - nyDate.getTime();
+    const lS = new Date(nyDate.setHours(9, 30, 0, 0) + diff);
+    const lE = new Date(nyDate.setHours(11, 0, 0, 0) + diff);
+    range.innerText = `LOCAL: ${lS.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true})} - ${lE.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true})}`;
+  }
+  setInterval(tick, 1000); tick();
 
-    // --- LOGIC ENGINE ---
-    const steps = document.querySelectorAll('.step');
-    const gateSteps = document.querySelectorAll('.gate-step');
-    const master = document.getElementById('master');
-    const mstatus = document.getElementById('mstatus');
-    const mmsg = document.getElementById('mmsg');
-    const flow = document.getElementById('bottom-flow');
-    const gate = document.getElementById('os-gate');
-
-    function updateMaster() {
-      const sDone = Array.from(steps).filter(s => s.checked).length;
-      const gDone = Array.from(gateSteps).filter(s => s.checked).length;
-      
-      if (sDone === steps.length) {
-        gate.classList.add('armed'); gateSteps.forEach(gs => gs.disabled = false);
-        mstatus.innerText = "STANDBY";
-        mmsg.innerText = "Gate armed. Complete final validation protocol.";
-      } else {
-        gate.classList.remove('armed'); gateSteps.forEach(gs => { gs.disabled = true; gs.checked = false; });
-        mstatus.innerText = "NO-GO";
-        mmsg.innerText = "Complete sections S1–S4 to arm the gate.";
-      }
-
-      if (sDone === steps.length && gDone === gateSteps.length) {
-        mstatus.innerText = "GO"; mstatus.style.color = "var(--green)";
-        flow.style.display = "block";
-        window.scrollTo({ top: document.getElementById('exec-alert').offsetTop - 50, behavior: 'smooth' });
-      } else {
-        mstatus.style.color = "var(--ink)";
-        flow.style.display = "none";
-      }
-    }
-    [...steps, ...gateSteps].forEach(s => s.addEventListener('change', updateMaster));
-
-    // --- MATH HUB ---
-    function calcBuffer() {
-      const dd = parseFloat(document.getElementById('maxDD').value);
-      const rpt = parseFloat(document.getElementById('riskAmt').value);
-      const disp = document.getElementById('bufferDisplay');
-      if (dd > 0 && rpt > 0) {
-        disp.innerHTML = `Buffer survives <b>${Math.floor(dd/rpt)}</b> consecutive losses.`;
-        disp.style.color = "var(--ink)";
-      } else {
-        disp.innerText = "Survival math required for deployment...";
-        disp.style.color = "var(--line)";
-      }
-    }
-
-    function calcPnL() {
-      const b = parseFloat(document.getElementById('balBefore').value) || 0;
-      const a = parseFloat(document.getElementById('balAfter').value) || 0;
-      const d = a - b;
-      const res = document.getElementById('pnlResult');
-      res.innerText = `NET RESULT: ${d >= 0 ? '+' : ''}$${d.toLocaleString(undefined, {minimumFractionDigits:2})}`;
-      res.className = "pnl-output " + (d > 0 ? "pnl-gain" : d < 0 ? "pnl-loss" : "");
-    }
-
-    // --- TELEMETRY HUB ---
-    function tick() {
-      const now = new Date();
-      document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-      
-      const nyStr = now.toLocaleString("en-US", {timeZone: "America/New_York"});
-      const nyDate = new Date(nyStr);
-      const nyMins = (nyDate.getHours()*60) + nyDate.getMinutes();
-      const inW = nyMins >= (9*60+30) && nyMins <= 11*60;
-      
-      const tag = document.getElementById('session-status');
-      tag.innerText = inW ? "IN WINDOW (NY AM)" : "OUTSIDE WINDOW";
-      tag.className = "session-tag " + (inW ? "tag-in" : "tag-out");
-      
-      const diff = now.getTime() - nyDate.getTime();
-      const lS = new Date(nyDate.setHours(9, 30, 0, 0) + diff);
-      const lE = new Date(nyDate.setHours(11, 0, 0, 0) + diff);
-      document.getElementById('local-range').innerText = `LOCAL: ${lS.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true})} - ${lE.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true})}`;
-    }
-    setInterval(tick, 1000); tick();
-
-    // --- IMAGE ENGINE ---
-    function handlePreview(i) {
-      const file = i.files[0];
-      if (file) {
-        const r = new FileReader();
-        r.onload = e => { 
-          const img = document.getElementById('preview-img');
-          img.src = e.target.result; 
-          img.style.display='block'; 
-          document.getElementById('upload-hint').style.display='none';
-        };
-        r.readAsDataURL(file);
-      }
-    }
-
-    // --- ARCHIVE ENGINE: THE "NO-CUTOFF" FIX ---
-    async function commitInternalLog() {
-      const overlay = document.getElementById('status-overlay');
-      overlay.style.display = 'flex';
-      
-      const logicArea = document.getElementById('j-logic');
-      const psyArea = document.getElementById('j-psy');
-      
-      // Temporary Force Expansion to prevent scroll cut-off
-      const oldLogicHeight = logicArea.style.height;
-      const oldPsyHeight = psyArea.style.height;
-      logicArea.style.height = logicArea.scrollHeight + "px";
-      psyArea.style.height = psyArea.scrollHeight + "px";
-
-      try {
-        const target = document.getElementById('journal-capture-zone');
-        // High fidelity visual capture (2x scale for clarity)
-        const canvas = await html2canvas(target, { backgroundColor: "#D1D4DC", scale: 1.5, useCORS: true });
-        
-        // Revert UI to standard state
-        logicArea.style.height = oldLogicHeight;
-        psyArea.style.height = oldPsyHeight;
-
-        const entry = { id: Date.now(), ts: new Date().toLocaleString(), img: canvas.toDataURL("image/jpeg", 0.75) };
-        const tx = db.transaction("logs", "readwrite");
-        tx.objectStore("logs").add(entry);
-        tx.oncomplete = () => {
-          overlay.style.display='none';
-          alert("RECORD COMMITTED TO PERMANENT LOCAL DATABASE.");
-        };
-      } catch (err) {
-        overlay.style.display='none';
-        alert("CRITICAL ERROR: " + err);
-      }
-    }
-
-    function loadVisualHistory() {
-      const g = document.getElementById('gallery-container');
-      g.innerHTML = '<div style="text-align:center; font-family:var(--mono); padding:50px;">DECRYPTING ARCHIVES...</div>';
-      
-      const tx = db.transaction("logs", "readonly");
-      tx.objectStore("logs").getAll().onsuccess = e => {
-        const logs = e.target.result.sort((a,b) => b.id - a.id);
-        if(!logs.length) { 
-          g.innerHTML = '<div class="panel" style="padding:100px; text-align:center; color:var(--line); border-style:dashed;">DATABASE EMPTY. NO LOGS DETECTED.</div>'; 
-          return; 
-        }
-        g.innerHTML = logs.map(l => `
-          <div class="history-card" onclick="openLightbox('${l.img}')">
-            <div class="h-meta">
-              <span>RECORD_STAMP: ${l.ts}</span>
-              <button onclick="delLog(${l.id}, event)" style="background:none; border:none; color:var(--red); cursor:pointer; font-family:var(--mono); font-size:10px;">[PURGE]</button>
-            </div>
-            <img src="${l.img}" class="h-img-preview" alt="Visual Log">
-          </div>
-        `).join('');
+  // --- IMAGES ---
+  function handlePreview(input) {
+    const file = input.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('preview-img').src = e.target.result;
+        document.getElementById('preview-img').style.display = 'block';
+        document.getElementById('upload-hint').style.display = 'none';
       };
+      reader.readAsDataURL(file);
     }
+  }
 
-    function delLog(id, e) {
-      e.stopPropagation();
-      if(confirm("Confirm permanent deletion of record?")) {
-        const tx = db.transaction("logs","readwrite");
-        tx.objectStore("logs").delete(id);
-        tx.oncomplete = () => loadVisualHistory();
-      }
-    }
-
-    function openLightbox(s) { 
-      document.getElementById('lb-img').src = s; 
-      document.getElementById('lightbox').style.display = 'block'; 
-    }
-    
-    function downloadManualPNG() {
+  // --- PERSISTENCE ---
+  async function commitInternalVisual() {
+    if (!db) return;
+    const overlay = document.getElementById('status-overlay');
+    overlay.style.display = 'flex';
+    try {
       const target = document.getElementById('journal-capture-zone');
-      html2canvas(target, { backgroundColor: "#D1D4DC", scale: 2 }).then(c => {
-        const link = document.createElement('a'); 
-        link.download = `Executioner_Log_${Date.now()}.png`; 
-        link.href = c.toDataURL(); 
-        link.click();
-      });
-    }
+      const canvas = await html2canvas(target, { backgroundColor: "#D1D4DC", scale: 1.5, useCORS: true });
+      const entry = { id: Date.now(), ts: new Date().toLocaleString(), img: canvas.toDataURL("image/jpeg", 0.8) };
+      const tx = db.transaction("trades", "readwrite");
+      tx.objectStore("trades").add(entry);
+      tx.oncomplete = () => { overlay.style.display = 'none'; alert("VISUAL LOG COMMITTED."); };
+    } catch (e) { overlay.style.display = 'none'; alert(e); }
+  }
 
-    function resetSession() {
-      if(confirm("Confirm: This will clear the active console. Permanent logs will remain.")) window.location.reload();
-    }
-  </script>
+  function loadInternalGallery() {
+    const g = document.getElementById('internal-gallery');
+    g.innerHTML = '<div style="font-family:var(--mono); text-align:center; padding:20px;">Fetching logs...</div>';
+    const tx = db.transaction("trades", "readonly");
+    tx.objectStore("trades").getAll().onsuccess = e => {
+      const logs = e.target.result;
+      if (!logs.length) { g.innerHTML = '<div class="panel" style="padding:40px; text-align:center; color:var(--ink-faint); font-family:var(--mono);">Empty History.</div>'; return; }
+      logs.sort((a,b) => b.id - a.id);
+      g.innerHTML = logs.map(l => `
+        <div class="history-item">
+          <div class="history-meta"><span>RECORD: ${l.ts}</span><button class="btn" style="padding:4px 10px; width:auto; border-color:white; color:white; font-size:9px;" onclick="deleteEntry(${l.id})">DELETE</button></div>
+          <div class="history-thumb" onclick="openLightbox('${l.img}')"><img src="${l.img}"></div>
+        </div>
+      `).join('');
+    };
+  }
+
+  function openLightbox(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'block'; }
+  function deleteEntry(id) { if(confirm("Delete record?")) { const tx = db.transaction("trades", "readwrite"); tx.objectStore("trades").delete(id); tx.oncomplete = () => loadInternalGallery(); } }
+
+  function downloadManualPNG() {
+    const target = document.getElementById('journal-capture-zone');
+    html2canvas(target, { backgroundColor: "#D1D4DC", scale: 2, useCORS: true }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `FeX_Journal_${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  }
+
+  function resetSession() { if(confirm("Reset screen?")) window.location.reload(); }
+</script>
 </body>
 </html>
